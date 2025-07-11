@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Golden Shield Create Account</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='logo.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login_create_account.css') }}">
+</head>
+<body>
+  <header>
+    <a href="{{ url_for('index') }}" style="text-decoration: none;">
+        <div class="logo">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          </svg>
+          <span>Golden Shield</span>
+        </div>
+    </a>
+  </header>
+  <main>
+    <form method="POST" action="{{ url_for('register') }}">
+      <h1>Create Account</h1>
+
+      <div class="toggle-buttons">
+        <a href="{{ url_for('login') }}" class="login">Login</a>
+        <a href="{{ url_for('create_account') }}" class="create-account">Create Account</a>
+      </div>
+
+      <label for="fullname">Full Name</label>
+      <input type="text" id="fullname" name="fullname" placeholder="Enter your full name" required />
+
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" placeholder="Enter your email" required />
+
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" placeholder="Enter your password" required />
+
+      <label for="role">Role</label>
+      <select id="role" name="role" required>
+        <option value="">Select role</option>
+        <option value="senior">Senior</option>
+<!--        <option value="admin">Admin</option>-->
+      </select>
+
+      <button type="submit" class="submit">Create Account</button>
+    </form>
+  </main>
+
+<!-- Flash Message Popup -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div id="flash-container">
+      {% for category, message in messages %}
+        <div class="flash-popup {{ category }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<script>
+  // Auto-remove flash messages after animation
+  setTimeout(() => {
+    const container = document.getElementById('flash-container');
+    if (container) {
+      container.remove();
+    }
+  }, 4000);
+</script>
+
+
+</body>
+</html>

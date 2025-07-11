@@ -1,0 +1,258 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Golden Shield Admin Devices</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_devices.css') }}">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='logo.png') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet"/>
+
+</head>
+<body>
+  <aside>
+    <div class="sidebar-top">
+      <a href="#" class="logo-link" aria-label="Golden Shield logo">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" >
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill="white" stroke="#2563eb"></path>
+        </svg>
+        <span class="logo-text">Golden Shield</span>
+      </a>
+      <p class="dashboard-label">Admin Devices</p>
+      <nav class="sidebar-nav" aria-label="Main navigation">
+        <a href="{{ url_for('admin_dashboard') }}">
+          <i class="fas fa-th-large" aria-hidden="true"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="{{ url_for('admin_senior_users') }}">
+          <i class="fas fa-user-friends" aria-hidden="true"></i>
+          <span>Senior Users</span>
+        </a>
+        <a href="{{ url_for('admin_website_activity') }}">
+          <i class="fas fa-globe" aria-hidden="true"></i>
+          <span>Website Activity</span>
+        </a>
+        <a href="{{ url_for('admin_filtering_rules') }}">
+          <i class="fas fa-filter" aria-hidden="true"></i>
+          <span>Filtering Rules</span>
+        </a>
+        <a href="{{ url_for('admin_devices') }}" class="active" aria-current="page">
+          <i class="fas fa-desktop" aria-hidden="true"></i>
+          <span>Devices</span>
+        </a>
+        <a href="{{ url_for('admin_notification') }}">
+          <i class="fas fa-bell" aria-hidden="true"></i>
+          <span>Notifications</span>
+        </a>
+        <a href="{{ url_for('admin_report') }}">
+          <i class="fas fa-file-alt" aria-hidden="true"></i>
+          <span>Reports</span>
+        </a>
+        <a href="{{ url_for('admin_setting') }}">
+          <i class="fas fa-cog" aria-hidden="true"></i>
+          <span>Settings</span>
+        </a>
+      </nav>
+    </div>
+    <div class="sidebar-bottom">
+      <a href="{{ url_for('logout') }}">
+        <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
+        <span>Logout</span>
+      </a>
+      <a href="#">
+        <i class="fas fa-user" aria-hidden="true"></i>
+        <span>Admin User</span>
+      </a>
+    </div>
+  </aside>
+
+  <main class="container">
+    <h2>Device Management</h2>
+
+    <div class="cards">
+      <div class="card">
+        <div>
+          <p class="card-text">Total Devices</p>
+          <p class="card-number">{{ total_devices }}</p>
+        </div>
+        <div class="icon-circle icon-blue">
+          <i class="fas fa-hdd"></i>
+        </div>
+      </div>
+
+      <div class="card">
+        <div>
+          <p class="card-text">Online</p>
+          <p class="card-number">{{ online_devices }}</p>
+        </div>
+        <div class="icon-circle icon-green">
+          <div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div>
+          <p class="card-text">Offline</p>
+          <p class="card-number">{{ offline_devices }}</p>
+        </div>
+        <div class="icon-circle icon-gray">
+          <div></div>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="device-list-container">
+      <div class="device-list-header">
+        <h3>Device List</h3>
+        <div class="search-toggle">
+          <label class="search-wrapper" for="search">
+            <input type="search" id="search" placeholder="Search devices..." />
+            <i class="fas fa-search"></i>
+          </label>
+          <label class="toggle-label" for="activeToggle">
+            <input type="checkbox" id="activeToggle" />
+            <span class="toggle-slider"></span>
+            Show only active devices
+          </label>
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Device Name</th>
+            <th>Senior User</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Last Seen</th>
+            <th>IP Address</th>
+            <th>Filter Level</th>
+            <th>Connection Duration</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="deviceTableBody">
+          {% for user in senior_users %}
+          <tr id="user-{{ loop.index }}">
+            <td><i class="fas fa-tablet-alt"></i> {{ user.device }}</td>
+            <td>{{ user.fullname }}</td>
+            <td>{{ user.role }}</td>
+            <td><span class="status {{ 'online' if user.status == 'online' else 'offline' }}">{{ user.status.capitalize() }}</span></td>
+            <td class="last-active">{{ user.last_active }}</td>
+            <td><code class="ip">{{ user.ip_address }}</code></td>
+            <td><span class="filter-level filter-{{ user.filter_level | lower }}">{{ user.filter_level }}</span></td>
+            <td class="connection-duration" data-last-active="{{ user.last_active }}">
+              {% if user.connection_duration %}
+                {{ user.connection_duration.hours }}h {{ user.connection_duration.minutes }}m {{ user.connection_duration.seconds }}s
+              {% else %}
+                N/A
+              {% endif %}
+            </td>
+            <td>...</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <script>
+    const activeToggle = document.getElementById('activeToggle');
+    const deviceTableBody = document.getElementById('deviceTableBody');
+
+    activeToggle.addEventListener('change', () => {
+      const showOnlyActive = activeToggle.checked;
+      const rows = deviceTableBody.querySelectorAll('tr');
+      rows.forEach(row => {
+        const statusSpan = row.querySelector('td:nth-child(4) .status');
+        if (showOnlyActive) {
+          if (!statusSpan.classList.contains('online')) {
+            row.style.display = 'none';
+          } else {
+            row.style.display = '';
+          }
+        } else {
+          row.style.display = '';
+        }
+      });
+    });
+  </script>
+
+
+<script>
+  function updateConnectionDurations() {
+    const rows = document.querySelectorAll('#deviceTableBody tr');
+    const now = new Date();
+    rows.forEach(row => {
+      const statusCell = row.querySelector('.status');
+      const lastActiveCell = row.querySelector('.last-active');
+      const durationCell = row.querySelector('.connection-duration');
+      // Check if the user is offline
+      if (statusCell.textContent.trim().toLowerCase() === 'offline') {
+        return; // Skip updating this row
+      }
+      const lastActiveTime = new Date(lastActiveCell.textContent);
+      // Calculate the difference in seconds
+      const diffInSeconds = Math.floor((now - lastActiveTime) / 1000);
+
+      // Calculate hours, minutes, and seconds
+      const hours = Math.floor(diffInSeconds / 3600);
+      const minutes = Math.floor((diffInSeconds % 3600) / 60);
+      const seconds = diffInSeconds % 60;
+      // Update the duration display
+      durationCell.textContent = `${hours}h ${minutes}m ${seconds}s`;
+    });
+  }
+  // Update the connection durations every second
+  setInterval(updateConnectionDurations, 1000);
+</script>
+
+
+<script>
+  const activeToggle = document.getElementById('activeToggle');
+  const deviceTableBody = document.getElementById('deviceTableBody');
+  const searchInput = document.getElementById('search');
+
+  // Function to filter devices based on search input
+  function filterDevices() {
+    const searchTerm = searchInput.value.toLowerCase();
+    const rows = deviceTableBody.querySelectorAll('tr');
+
+    rows.forEach(row => {
+      const deviceName = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
+
+      // Check if the search term matches the device name
+      if (deviceName.includes(searchTerm)) {
+        row.style.display = ''; // Show the row
+      } else {
+        row.style.display = 'none'; // Hide the row
+      }
+    });
+  }
+
+  // Event listener for search input
+  searchInput.addEventListener('input', filterDevices);
+
+  // Event listener for active toggle
+  activeToggle.addEventListener('change', () => {
+    const showOnlyActive = activeToggle.checked;
+    const rows = deviceTableBody.querySelectorAll('tr');
+    rows.forEach(row => {
+      const statusSpan = row.querySelector('td:nth-child(4) .status');
+      if (showOnlyActive) {
+        if (!statusSpan.classList.contains('online')) {
+          row.style.display = 'none';
+        } else {
+          row.style.display = '';
+        }
+      } else {
+        row.style.display = '';
+      }
+    });
+  });
+</script>
+
+
+</body>
+</html>

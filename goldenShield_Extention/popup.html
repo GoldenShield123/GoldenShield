@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Golden Shield</title>
+  <style>
+    /* Base Reset and Typography */
+    * {
+      box-sizing: border-box;
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #ffffff;
+      color: #6b7280;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      width: 400px;
+      height: 500px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+    /* Container */
+    .container {
+      max-width: 400px;
+      width: 100%;
+      background: #fff;
+      margin-top: 24px;
+      padding: 24px 32px 32px;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    /* Logo */
+    .logo {
+      width: 84px;
+      margin-bottom: 16px;
+    }
+    /* Headline */
+    h1 {
+      font-size: 48px;
+      font-weight: 700;
+      margin: 0 0 12px;
+      color: #111827;
+      user-select: none;
+      text-align: center;
+      line-height: 1.1;
+    }
+    /* Subtext */
+    p.subtext {
+      font-size: 18px;
+      color: #4b5563;
+      margin: 0 0 24px;
+      text-align: center;
+      max-width: 320px;
+    }
+    /* Button */
+    button#refresh {
+      background-color: #111827;
+      color: #ffffff;
+      border: none;
+      padding: 14px 20px;
+      font-size: 18px;
+      font-weight: 600;
+      border-radius: 10px;
+      cursor: pointer;
+      width: 100%;
+      box-shadow: 0 5px 15px rgb(17 24 39 / 0.3);
+      transition: background-color 0.3s ease, transform 0.2s ease;
+      user-select: none;
+    }
+    button#refresh:hover,
+    button#refresh:focus {
+      background-color: #374151;
+      outline: none;
+      transform: translateY(-2px);
+    }
+    /* Browsing history card */
+    .history-card {
+      background-color: #f9fafb;
+      width: 100%;
+      margin-top: 32px;
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgb(0 0 0 / 0.04);
+      padding: 20px 24px;
+      overflow-y: auto;
+      max-height: 260px;
+      display: flex;
+      flex-direction: column;
+    }
+    .history-card h2 {
+      margin: 0 0 16px;
+      font-weight: 700;
+      font-size: 24px;
+      color: #111827;
+      user-select: none;
+    }
+    /* Browsing history list */
+    ul#browsingHistory {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      flex-grow: 1;
+    }
+    ul#browsingHistory li {
+      font-size: 16px;
+      line-height: 1.4;
+      color: #374151;
+      margin-bottom: 10px;
+      user-select: text;
+      word-break: break-word;
+    }
+    ul#browsingHistory li:last-child {
+      margin-bottom: 0;
+    }
+    /* Status message */
+    #status {
+      margin-top: 20px;
+      font-size: 15px;
+      color: #9ca3af;
+      min-height: 20px;
+      user-select: none;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <main class="container" role="main" aria-label="Golden Shield extension controls">
+    <img src="logo.png" alt="Golden Shield logo" class="logo" />
+    <h1>Golden Shield</h1>
+    <p class="subtext">Protect your browsing by blocking unwanted sites and viewing your recent history.</p>
+    <button id="refresh" aria-label="Refresh the block list">Refresh Block List</button>
+
+<!--    <section class="history-card" aria-live="polite" aria-label="Recent Browsing History">-->
+<!--      <h2>Recent Browsing History</h2>-->
+<!--      <ul id="browsingHistory" role="list" tabindex="0">-->
+<!--        &lt;!&ndash; History items will be appended here &ndash;&gt;-->
+<!--      </ul>-->
+<!--      <p id="status" aria-atomic="true"></p>-->
+<!--    </section>-->
+  </main>
+
+  <script>
+    async function loadBrowsingHistory() {
+      const statusEl = document.getElementById('status');
+      const historyEl = document.getElementById('browsingHistory');
+      historyEl.innerHTML = "";
+      statusEl.textContent = "Loading browsing history...";
+      try {
+        const response = await fetch("http://localhost:5000/user_dashboard");
+        if (!response.ok) throw new Error("Network response was not ok");
+        const data = await response.json();
+        if (!Array.isArray(data) || data.length === 0) {
+          statusEl.textContent = "No browsing history available.";
+          return;
+        }
+        statusEl.textContent = "";
+        for (const entry of data) {
+          const li = document.createElement("li");
+          li.textContent = entry;
+          historyEl.appendChild(li);
+        }
+      } catch (err) {
+        statusEl.textContent = "Failed to load browsing history.";
+        console.error("Failed to load browsing history:", err);
+      }
+    }
+
+    document.getElementById("refresh").addEventListener("click", () => {
+      chrome.runtime.sendMessage({ command: "refresh" }, (response) => {
+        if (response && response.status === "refreshed") {
+          alert(" Block list refreshed successfully!");
+          loadBrowsingHistory();
+        } else {
+          alert(" Failed to refresh block list.");
+        }
+      });
+    });
+
+    // Load browsing history on popup open
+    document.addEventListener("DOMContentLoaded", loadBrowsingHistory);
+  </script>
+</body>
+</html>
+

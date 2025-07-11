@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Golden Shield Admin Senior Users</title>
+  <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='logo.png') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_senior_users.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <aside>
+    <div class="sidebar-top">
+      <a href="#" class="logo-link" aria-label="Golden Shield logo">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill="white" stroke="#2563eb"></path>
+        </svg>
+        <span class="logo-text">Golden Shield</span>
+      </a>
+      <p class="dashboard-label">Admin Senior Users</p>
+      <nav class="sidebar-nav" aria-label="Main navigation">
+        <a href="{{ url_for('admin_dashboard') }}">
+          <i class="fas fa-th-large" aria-hidden="true"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="{{ url_for('admin_senior_users') }}" class="active" aria-current="page">
+          <i class="fas fa-user-friends" aria-hidden="true"></i>
+          <span>Senior Users</span>
+        </a>
+        <a href="{{ url_for('admin_website_activity') }}">
+          <i class="fas fa-globe" aria-hidden="true"></i>
+          <span>Website Activity</span>
+        </a>
+        <a href="{{ url_for('admin_filtering_rules') }}">
+          <i class="fas fa-filter" aria-hidden="true"></i>
+          <span>Filtering Rules</span>
+        </a>
+        <a href="{{ url_for('admin_devices') }}">
+          <i class="fas fa-desktop" aria-hidden="true"></i>
+          <span>Devices</span>
+        </a>
+        <a href="{{ url_for('admin_notification') }}">
+          <i class="fas fa-bell" aria-hidden="true"></i>
+          <span>Notifications</span>
+        </a>
+        <a href="{{ url_for('admin_report') }}">
+          <i class="fas fa-file-alt" aria-hidden="true"></i>
+          <span>Reports</span>
+        </a>
+        <a href="{{ url_for('admin_setting') }}">
+          <i class="fas fa-cog" aria-hidden="true"></i>
+          <span>Settings</span>
+        </a>
+      </nav>
+    </div>
+    <div class="sidebar-bottom">
+      <a href="{{ url_for('logout') }}">
+        <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
+        <span>Logout</span>
+      </a>
+      <a href="#">
+        <i class="fas fa-user" aria-hidden="true"></i>
+        <span>Admin User</span>
+      </a>
+    </div>
+  </aside>
+
+  <main class="container">
+    <header class="header">
+      <h1>Senior Users</h1>
+      <button class="btn-add" type="button">
+        <i class="fas fa-user-plus"></i> Add Senior User
+      </button>
+    </header>
+
+    <section class="card" aria-label="Senior Users List">
+      <div class="card-header">
+        <h2>All Senior Users</h2>
+        <div class="search-wrapper">
+          <input type="search" placeholder="Search users..." aria-label="Search users" />
+          <i class="fas fa-search icon" aria-hidden="true"></i>
+        </div>
+      </div>
+
+      <table role="table" aria-label="Senior Users Table">
+        <thead>
+          <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Device</th>
+            <th scope="col">Status</th>
+            <th scope="col">Filter Level</th>
+            <th scope="col">Last Active</th>
+            <th scope="col" class="actions">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if senior_users %}
+            {% for user in senior_users %}
+            <tr>
+              <td><strong>{{ user.get('fullname', 'No Name') }}</strong></td>
+              <td>{{ user.get('device', 'N/A') }}</td>
+              <td>
+                {% if user.get('status') == 'online' %}
+                  <span class="badge online">Online</span>
+                {% else %}
+                  <span class="badge offline">Offline</span>
+                {% endif %}
+              </td>
+              <td>
+                <span class="badge {{ user.get('filter_level', 'easy') | lower }}">{{ user.get('filter_level', 'Easy') }}</span>
+              </td>
+              <td>{{ user.get('last_active', 'Never') }}</td>
+              <td class="actions">
+                <button aria-label="Actions for {{ user.get('fullname', 'User') }}" class="actions-btn" aria-haspopup="true" aria-expanded="false" id="action-btn-{{ loop.index0 }}" onclick="toggleDropdown(event)">
+                  ...
+                </button>
+                <div class="dropdown-menu" role="menu" aria-labelledby="action-btn-{{ loop.index0 }}">
+                  <button role="menuitem">
+                    <i class="fas fa-list-alt"></i> View Activity Logs
+                  </button>
+                  <button role="menuitem">
+                    <i class="fas fa-edit"></i> Edit
+                  </button>
+                  <button role="menuitem" class="delete">
+                    <i class="fas fa-trash-alt"></i> Delete
+                  </button>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          {% else %}
+            <tr>
+              <td colspan="6" style="text-align:center;">No senior users found.</td>
+            </tr>
+          {% endif %}
+        </tbody>
+
+      </table>
+    </section>
+  </main>
+
+  <!-- Add Senior User Modal -->
+<!-- Add Senior User Modal -->
+<div id="addSeniorModal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="modalTitle" tabindex="-1">
+  <div class="modal-content" role="document">
+    <header>
+      <h2 id="modalTitle">Add Senior User</h2>
+      <button type="button" class="close-modal" aria-label="Close" onclick="closeModal('addSeniorModal')">
+        <i class="fas fa-times"></i>
+      </button>
+    </header>
+    <form id="addSeniorForm">
+      <label for="fullname">Full Name</label>
+      <input id="fullname" name="fullname" type="text" required />
+
+      <label for="email">Email</label>
+      <input id="email" name="email" type="email" required />
+
+      <label for="password">Password</label>
+      <input id="password" name="password" type="password" required />
+
+      <label for="mac_address">
+        MAC Address
+        <button type="button" id="macHelpBtn" aria-label="How to find MAC address tutorial">
+          <i class="fas fa-question-circle"></i>
+        </button>
+      </label>
+      <input id="mac_address" name="mac_address" type="text" placeholder="a6-08-48-75-35-9f" pattern="([0-9a-fA-F]{2}[:-]){5}([0-9a-fA-F]{2})" required />
+
+      <label for="ip_address">IP Address</label>
+      <input id="ip_address" name="ip_address" type="text" placeholder="192.168.0.10" required />
+
+      <button type="submit" class="btn-submit">Add User</button>
+    </form>
+  </div>
+</div>
+
+
+<!-- Video Tutorial Modal -->
+<div id="tutorialModal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="tutorialTitle" tabindex="-1">
+  <div class="modal-content" role="document">
+    <header>
+      <h2 id="tutorialTitle">How to Find Your MAC Address</h2>
+      <button type="button" class="close-modal" aria-label="Close" onclick="closeModal('tutorialModal')">
+        <i class="fas fa-times"></i>
+      </button>
+    </header>
+    <video id="macVideo" width="100%" controls>
+      <source src="{{ url_for('static', filename='videos/videoTutorial.mp4') }}" type="video/mp4" />
+      Your browser does not support the video tag.
+    </video>
+  </div>
+</div>
+
+
+  <script>
+    function toggleDropdown(event) {
+      const btn = event.currentTarget;
+      const expanded = btn.getAttribute("aria-expanded") === "true";
+      // Close all dropdowns first
+      document.querySelectorAll(".dropdown-menu").forEach(menu => {
+        menu.classList.remove("show");
+      });
+      document.querySelectorAll(".actions-btn").forEach(button => {
+        button.setAttribute("aria-expanded", "false");
+      });
+      if (!expanded) {
+        const dropdown = btn.nextElementSibling;
+        dropdown.classList.add("show");
+        btn.setAttribute("aria-expanded", "true");
+        // Close dropdown if clicked outside
+        function onClickOutside(e) {
+          if (!dropdown.contains(e.target) && e.target !== btn) {
+            dropdown.classList.remove("show");
+            btn.setAttribute("aria-expanded", "false");
+            document.removeEventListener("click", onClickOutside);
+          }
+        }
+        document.addEventListener("click", onClickOutside);
+      }
+    }
+  </script>
+
+<script>
+  // Get the search input and the table body
+  const searchInput = document.querySelector('.search-wrapper input[type="search"]');
+  const tableBody = document.querySelector('tbody');
+
+  searchInput.addEventListener('input', function () {
+    const filter = this.value.toLowerCase();
+
+    // Get all table rows inside tbody
+    const rows = tableBody.querySelectorAll('tr');
+
+    rows.forEach(row => {
+      // Get the first <td> element which contains the name
+      const nameCell = row.querySelector('td strong');
+
+      if (nameCell) {
+        const nameText = nameCell.textContent.toLowerCase();
+        if (nameText.includes(filter)) {
+          row.style.display = ''; // Show row
+        } else {
+          row.style.display = 'none'; // Hide row
+        }
+      }
+    });
+  });
+</script>
+
+<script>
+  function closeModal(id) {
+    document.getElementById(id).setAttribute('aria-hidden', 'true');
+  }
+
+  function openModal(id) {
+    document.getElementById(id).setAttribute('aria-hidden', 'false');
+  }
+
+  // Open Add Senior User Modal
+  document.querySelector('.btn-add').addEventListener('click', () => {
+    openModal('addSeniorModal');
+  });
+
+  // Open Video Tutorial Modal
+  document.getElementById('macHelpBtn').addEventListener('click', () => {
+    openModal('tutorialModal');
+  });
+
+</script>
+
+  <script>
+document.getElementById('addSeniorForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+
+  const fullname = document.getElementById('fullname').value;
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+  const mac_address = document.getElementById('mac_address').value;
+  const ip_address = document.getElementById('ip_address').value;
+
+  const response = await fetch('/add_senior_user', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ fullname, email, password, mac_address, ip_address })
+  });
+
+  const result = await response.json();
+
+  if (result.success) {
+    alert('User added successfully');
+    location.reload(); // Or close modal and update list dynamically
+  } else {
+    alert('Error: ' + result.message);
+  }
+});
+</script>
+
+
+<script>
+  // Open the tutorial modal and play the video
+  document.getElementById('macHelpBtn').addEventListener('click', function () {
+    const modal = document.getElementById('tutorialModal');
+    const video = document.getElementById('macVideo');
+
+    modal.style.display = 'block';
+    modal.setAttribute('aria-hidden', 'false');
+    video.currentTime = 0; // start from beginning
+    video.play();
+  });
+
+  // Update closeModal to also pause the video
+  function closeModal(id) {
+    const modal = document.getElementById(id);
+    modal.style.display = 'none';
+    modal.setAttribute('aria-hidden', 'true');
+
+    // Pause and reset video if it exists
+    const video = modal.querySelector('video');
+    if (video) {
+      video.pause();
+      video.currentTime = 0;
+    }
+  }
+</script>
+
+
+</body>
+</html>
+
+
+<style>
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6);
+    justify-content: center;
+    align-items: center;
+  }
+
+  .modal[aria-hidden="false"] {
+    display: flex;
+  }
+
+  .modal-content {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  }
+
+  .modal-content header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .modal-content header h2 {
+    font-size: 1.25rem;
+    margin: 0;
+  }
+
+  .close-modal {
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #333;
+  }
+
+  .modal-content form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .modal-content input,
+  .modal-content button {
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+
+  .modal-content .btn-submit {
+    background-color: #2563eb;
+    color: white;
+    cursor: pointer;
+    border: none;
+  }
+
+  #macHelpBtn {
+    background: #2563eb;
+    color: white;
+    font-weight: bold;
+    margin-left: 10px;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+  }
+
+  #tutorialModal iframe {
+    width: 100%;
+    height: 300px;
+    border: none;
+  }
+
+  button#macHelpBtn i,
+button.close-modal i {
+  font-size: 1.2em;
+  color: #333;
+}
+
+button#macHelpBtn,
+button.close-modal {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+#tutorialModal .modal-content {
+  width: 90%;
+  max-width: 250px;
+  padding: 0.3rem;
+  background: white;
+  border-radius: 6px;
+  margin: auto;
+  position: relative;
+  top: 10%;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+#tutorialModal iframe {
+  width: 100%;
+  height: 70px; /* super small height */
+  border: none;
+  border-radius: 4px;
+}
+
+}
+
+}
+
+
+</style>

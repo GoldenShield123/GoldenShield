@@ -1,0 +1,379 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Golden Shield User Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='logo.png') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet"/>
+  <style>
+    body {
+      font-family: "Inter", sans-serif;
+      margin: 0;
+      padding-bottom: 64px; /* space for fixed footer */
+      background-color: #e6f0ff;
+      color: black;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    main {
+      flex-grow: 1;
+      max-width: 768px; /* max width for larger screens */
+      margin-left: auto;
+      margin-right: auto;
+      padding: 1.5rem;
+      width: 100%;
+      box-sizing: border-box;
+      overflow-y: auto;
+      transition: transform 0.2s ease;
+      transform-origin: top center;
+    }
+  </style>
+  <script>
+    let zoomLevel = 1;
+    function showProtection(level) {
+      const easy = document.getElementById("easyProtection");
+      const moderate = document.getElementById("moderateProtection");
+      const hard = document.getElementById("hardProtection");
+      if (level === "easy") {
+        easy.classList.remove("hidden");
+        moderate.classList.add("hidden");
+        hard.classList.add("hidden");
+      } else if (level === "moderate") {
+        easy.classList.add("hidden");
+        moderate.classList.remove("hidden");
+        hard.classList.add("hidden");
+      } else if (level === "hard") {
+        easy.classList.add("hidden");
+        moderate.classList.add("hidden");
+        hard.classList.remove("hidden");
+      } else {
+        easy.classList.remove("hidden");
+        moderate.classList.add("hidden");
+        hard.classList.add("hidden");
+      }
+    }
+
+    function zoomContent(increment) {
+      zoomLevel += increment;
+      if (zoomLevel < 0.5) zoomLevel = 0.5;
+      if (zoomLevel > 3) zoomLevel = 3;
+      const main = document.querySelector("main");
+      main.style.transform = `scale(${zoomLevel})`;
+      // Update zoom percentage display
+      const zoomText = document.getElementById("zoomText");
+      if (zoomText) {
+        zoomText.textContent = Math.round(zoomLevel * 100) + "%";
+      }
+    }
+  </script>
+</head>
+<body>
+  <header class="flex items-center justify-between px-4 sm:px-6 md:px-8 py-4 border-b border-gray-200 bg-white">
+    <div class="flex items-center space-x-2">
+      <svg class="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 2L4 5v6c0 5.25 3.75 10 8 11 4.25-1 8-5.75 8-11V5l-8-3z"></path>
+      </svg>
+      <span class="font-semibold text-blue-600 text-base sm:text-lg select-none">Golden Shield</span>
+    </div>
+    <nav class="flex items-center space-x-2 sm:space-x-4 text-blue-600">
+      <button aria-label="Menu" class="text-blue-600 hover:text-blue-700 focus:outline-none">
+        <i class="fas fa-list-ul fa-lg"></i>
+      </button>
+      <button aria-label="Zoom out" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-blue-200 flex items-center justify-center text-blue-600 hover:bg-blue-50 focus:outline-none" onclick="zoomContent(-0.1)">
+        <span class="text-xl sm:text-2xl leading-none select-none">−</span>
+      </button>
+      <div class="hidden sm:flex items-center space-x-2 px-2 select-none">
+        <div class="w-14 h-3 rounded-full bg-blue-200 relative">
+          <div class="absolute top-0 left-0 h-3 w-7 rounded-full bg-blue-600" style="left: 25%;"></div>
+        </div>
+      </div>
+      <button aria-label="Zoom in" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-blue-200 flex items-center justify-center text-blue-600 hover:bg-blue-50 focus:outline-none" onclick="zoomContent(0.1)">
+        <span class="text-xl sm:text-2xl leading-none select-none">+</span>
+      </button>
+      <span id="zoomText" class="text-xs sm:text-sm select-none">100%</span>
+      <button aria-label="Sound" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full border border-blue-300 flex items-center justify-center text-blue-600 hover:bg-blue-50 focus:outline-none">
+        <i class="fas fa-volume-up fa-lg"></i>
+      </button>
+      <button aria-label="Call" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full border border-red-300 flex items-center justify-center text-red-400 hover:bg-red-50 focus:outline-none">
+        <i class="fas fa-phone fa-lg"></i>
+      </button>
+    </nav>
+  </header>
+
+  <main>
+    <section class="border border-blue-300 rounded-lg p-4 sm:p-6 bg-white" style="box-shadow: 0 0 0 1px #bfdbfe;">
+      <h2 class="text-xl sm:text-2xl font-semibold flex items-center space-x-2 select-none">
+        <!-- Shield icon in heading -->
+        <svg class="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 2L4 5v6c0 5.25 3.75 10 8 11 4.25-1 8-5.75 8-11V5l-8-3z"></path>
+        </svg>
+        <span>Browsing Safety Status</span>
+      </h2>
+
+      <div id="safetyStatus" class="border border-green-300 rounded-lg bg-green-50 text-green-600 text-base sm:text-lg font-medium py-4 sm:py-6 flex items-center justify-center select-none mt-4">
+          <svg class="w-8 h-8 sm:w-10 sm:h-10 mr-3 sm:mr-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4"></path>
+              <circle cx="12" cy="12" r="10" stroke-linecap="round" stroke-linejoin="round"></circle>
+          </svg>
+          <span id="safetyStatusText">Safe</span>
+      </div>
+
+
+      <div class="border border-blue-300 rounded-lg bg-blue-100 p-3 sm:p-4 text-gray-800 select-text mt-6">
+        <h3 class="font-semibold flex items-center space-x-2 mb-2 select-none text-blue-700 text-sm sm:text-base">
+          <svg class="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <circle cx="12" cy="12" r="10" stroke-linecap="round" stroke-linejoin="round"></circle>
+            <line x1="12" y1="16" x2="12" y2="12" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="12" y1="8" x2="12" y2="8" stroke-linecap="round" stroke-linejoin="round"></line>
+          </svg>
+          <span>Browsing Safety Tips</span>
+        </h3>
+        <ul class="list-disc list-inside space-y-1 text-xs sm:text-sm">
+          <li>Always check for the padlock icon in your browser</li>
+          <li>Never share personal information on unfamiliar websites</li>
+          <li>Be cautious of pop-up windows asking for information</li>
+          <li>If you're unsure about a website, ask for help</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Filter Level Section Outside Container with same width as browsing safety -->
+    <div class="border border-blue-300 rounded-xl p-6 sm:p-8 shadow-lg bg-white mt-10 mx-auto" style="max-width: 768px;">
+      <h2 class="text-xl sm:text-2xl font-extrabold mb-6 select-none">Filter Level</h2>
+      <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-6">
+        <button type="button" onclick="showProtection('easy')" class="flex-1 rounded-lg border border-green-400 bg-green-100 p-4 sm:p-6 flex flex-col items-center text-green-800 focus:outline-none focus:ring-2 focus:ring-green-500">
+          <i class="fas fa-seedling text-3xl sm:text-4xl mb-1 sm:mb-2"></i>
+          <span class="text-base sm:text-lg font-semibold">Easy</span>
+          <span class="text-xs sm:text-sm mt-1">Basic protection</span>
+        </button>
+        <button type="button" onclick="showProtection('moderate')" class="flex-1 rounded-lg border border-yellow-300 bg-yellow-100 p-4 sm:p-6 flex flex-col items-center text-yellow-800 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+          <i class="fas fa-exclamation-triangle text-3xl sm:text-4xl mb-1 sm:mb-2"></i>
+          <span class="text-base sm:text-lg font-semibold">Moderate</span>
+          <span class="text-xs sm:text-sm mt-1">Standard protection</span>
+        </button>
+        <button type="button" onclick="showProtection('hard')" class="flex-1 rounded-lg border border-red-300 bg-red-100 p-4 sm:p-6 flex flex-col items-center text-red-700 focus:outline-none focus:ring-2 focus:ring-red-400">
+          <i class="fas fa-shield-alt text-3xl sm:text-4xl mb-1 sm:mb-2"></i>
+          <span class="text-base sm:text-lg font-semibold">Hard</span>
+          <span class="text-xs sm:text-sm mt-1">Maximum protection</span>
+        </button>
+      </div>
+
+      <!-- Easy Protection Container -->
+      <div id="easyProtection" class="border border-gray-200 rounded-lg p-4 sm:p-5 text-black max-w-full">
+        <p class="font-semibold text-base sm:text-lg mb-1 flex items-center gap-2 select-none">
+          Easy Protection
+          <span class="inline-block ml-2 text-green-400 text-xl">🟢</span>
+        </p>
+        <p class="mb-3 text-sm sm:text-base">
+          Basic protection that blocks only the most harmful websites.
+        </p>
+        <p class="font-semibold text-gray-700 mb-2 flex items-center gap-2 select-none text-sm sm:text-base">
+          <i class="fas fa-exclamation-triangle text-yellow-600"></i> Blocked
+          Categories:
+        </p>
+        <div class="flex flex-wrap gap-2 text-xs sm:text-sm">
+          <span class="bg-gray-200 text-gray-700 rounded-full px-2 py-0.5 sm:px-3 sm:py-1 select-none flex items-center gap-1">
+            <i class="fas fa-bug"></i> Malware
+          </span>
+          <span class="bg-gray-200 text-gray-700 rounded-full px-2 py-0.5 sm:px-3 sm:py-1 select-none flex items-center gap-1">
+            <i class="fas fa-fish"></i> Phishing
+          </span>
+          <span class="bg-gray-200 text-gray-700 rounded-full px-2 py-0.5 sm:px-3 sm:py-1 select-none flex items-center gap-1">
+            <i class="fas fa-exclamation-circle"></i> Known Scams
+          </span>
+        </div>
+      </div>
+
+      <!-- Moderate Protection Container -->
+      <div id="moderateProtection" class="border border-gray-300 rounded-lg p-4 sm:p-5 max-w-full mt-5 hidden" style="min-height: 176px;">
+        <h2 class="text-base sm:text-lg font-semibold mb-2 select-none">
+          Moderate Protection
+          <span aria-label="Moderate Protection Indicator" role="img">🟡</span>
+        </h2>
+        <p class="mb-3 text-sm sm:text-base font-normal text-black">
+          Standard protection that blocks potentially harmful websites.
+        </p>
+        <p class="mb-2 font-semibold flex items-center text-black select-none text-sm sm:text-base">
+          <i class="fas fa-exclamation-triangle text-yellow-600 mr-2"></i> Blocked
+          Categories:
+        </p>
+        <div class="flex flex-wrap gap-2 text-xs sm:text-sm">
+          <span class="bg-gray-100 text-gray-800 rounded-full px-2 py-0.5 sm:px-3 sm:py-1 flex items-center gap-1">
+            <i class="fas fa-bug"></i> Malware
+          </span>
+          <span class="bg-gray-100 text-gray-800 rounded-full px-2 py-0.5 sm:px-3 sm:py-1 flex items-center gap-1">
+            <i class="fas fa-fish"></i> Phishing
+          </span>
+          <span class="bg-gray-100 text-gray-800 rounded-full px-2 py-0.5 sm:px-3 sm:py-1 flex items-center gap-1">
+            <i class="fas fa-user-secret"></i> Known Scams
+          </span>
+          <span class="bg-gray-100 text-gray-800 rounded-full px-2 py-0.5 sm:px-3 sm:py-1 flex items-center gap-1">
+            <i class="fas fa-exclamation-circle"></i> Adult Content
+          </span>
+          <span class="bg-gray-100 text-gray-800 rounded-full px-2 py-0.5 sm:px-3 sm:py-1 flex items-center gap-1">
+            <i class="fas fa-dice"></i> Gambling
+          </span>
+        </div>
+      </div>
+
+      <!-- Hard Protection Container -->
+      <div id="hardProtection" class="border border-gray-300 rounded-lg p-4 max-w-full mt-5 hidden" style="min-height: 176px;">
+        <h2 class="text-base sm:text-lg font-semibold mb-1 flex items-center gap-2 select-none">
+          Hard Protection
+          <span class="inline-block w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-red-600"></span>
+        </h2>
+        <p class="mb-3 text-sm sm:text-base font-normal">
+          Maximum protection that only allows specifically approved websites.
+        </p>
+        <p class="mb-2 font-semibold flex items-center gap-2 text-gray-800 select-none text-sm sm:text-base">
+          <i class="fas fa-exclamation-triangle text-orange-500"></i> Blocked
+          Categories:
+        </p>
+        <div class="flex flex-wrap gap-2 text-xs sm:text-sm">
+          <span class="bg-gray-100 text-gray-800 rounded-full px-2 py-0.5 sm:px-3 sm:py-1 flex items-center gap-1">
+            <i class="fas fa-ban"></i> All websites except whitelist
+          </span>
+          <span class="bg-gray-100 text-gray-800 rounded-full px-2 py-0.5 sm:px-3 sm:py-1 flex items-center gap-1">
+            <i class="fab fa-facebook"></i> Social Media
+          </span>
+          <span class="bg-gray-100 text-gray-800 rounded-full px-2 py-0.5 sm:px-3 sm:py-1 flex items-center gap-1">
+            <i class="fas fa-video"></i> Video Sharing
+          </span>
+          <span class="bg-gray-100 text-gray-800 rounded-full px-2 py-0.5 sm:px-3 sm:py-1 flex items-center gap-1">
+            <i class="fas fa-comments"></i> Forums
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Browsing History Section -->
+    <section class="border border-[#a8c0ff] rounded-xl p-6 sm:p-8 bg-white shadow-sm max-w-7xl mx-auto mt-10">
+      <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900 mb-6 flex items-center gap-2 select-none">
+        <i class="fas fa-history text-[#3b6de7] text-lg sm:text-xl"></i>
+        Recent Browsing History
+      </h2>
+      <ul class="space-y-4 sm:space-y-6" id="initialHistory">
+        {% for entry in initial_history %}
+          <li class="flex justify-between items-center border border-[#e6e8f0] rounded-xl p-3 sm:p-4">
+              <div class="flex items-center gap-3 sm:gap-4 text-[#6b7280]">
+                  <i class="fas fa-link fa-lg"></i>
+                  <div>
+                      <h3 class="text-base sm:text-lg font-semibold text-slate-900 leading-tight">{{ entry.title }}</h3>
+                      <p class="text-xs sm:text-sm text-slate-500 leading-tight">{{ entry.last_visited }}</p>
+                  </div>
+              </div>
+              <button onclick="checkSiteAccess('{{ entry.url }}')" class="text-blue-600 hover:underline">Check Access</button>
+          </li>
+        {% endfor %}
+      </ul>
+
+
+      <button id="viewMoreBtn" class="mt-4 text-blue-600 hover:underline" onclick="toggleHistory()">View More</button>
+
+      <div id="fullHistory" class="hidden mt-4">
+        <ul class="space-y-4 sm:space-y-6">
+          {% for entry in full_history %}
+            <li class="flex justify-between items-center border border-[#e6e8f0] rounded-xl p-3 sm:p-4">
+                <div class="flex items-center gap-3 sm:gap-4 text-[#6b7280]">
+                    <i class="fas fa-link fa-lg"></i>
+                    <div>
+                        <h3 class="text-base sm:text-lg font-semibold text-slate-900 leading-tight">{{ entry.title }}</h3>
+                        <p class="text-xs sm:text-sm text-slate-500 leading-tight">{{ entry.last_visited }}</p>
+                    </div>
+                </div>
+                <time class="text-xs sm:text-sm text-slate-400 flex items-center gap-1">
+                    <i class="far fa-clock"></i>
+                    {{ entry.last_visited }}
+                </time>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <footer class="fixed bottom-0 left-0 w-full bg-white border-t border-[#e6e8f0] flex justify-around items-center py-3 text-center text-xs sm:text-sm text-slate-900 z-10">
+    <a href="{{ url_for('user_dashboard') }}" class="flex flex-col items-center text-[#2563eb] font-semibold bg-[#2563eb] bg-opacity-20 rounded-lg px-4 py-2 sm:px-5 sm:py-3">
+      <i class="fas fa-home mb-1"></i>
+      Home
+    </a>
+    <a href="{{ url_for('user_setting') }}" class="flex flex-col items-center px-4 py-2 sm:px-5 sm:py-3">
+      <i class="fas fa-cog mb-1"></i>
+      Settings
+    </a>
+    <a href="{{ url_for('user_help') }}" class="flex flex-col items-center px-4 py-2 sm:px-5 sm:py-3">
+      <i class="fas fa-question-circle mb-1"></i>
+      Help
+    </a>
+    <a href="{{ url_for('user_FAQ') }}" class="flex flex-col items-center px-4 py-2 sm:px-5 sm:py-3">
+      <i class="far fa-comment-alt mb-1"></i>
+      FAQ
+    </a>
+    <a href="{{ url_for('logout') }}" class="flex flex-col items-center px-4 py-2 sm:px-5 sm:py-3">
+      <i class="fas fa-sign-out-alt mb-1"></i>
+      Logout
+    </a>
+  </footer>
+
+</body>
+</html>
+
+
+<script>
+      function toggleHistory() {
+        const fullHistory = document.getElementById('fullHistory');
+        const viewMoreBtn = document.getElementById('viewMoreBtn');
+
+        if (fullHistory.classList.contains('hidden')) {
+          fullHistory.classList.remove('hidden');
+          viewMoreBtn.textContent = 'View Less';
+        } else {
+          fullHistory.classList.add('hidden');
+          viewMoreBtn.textContent = 'View More';
+        }
+      }
+    </script>
+
+
+<script>
+  function checkSiteAccess(website) {
+    fetch('/check_access', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ website: website })
+    })
+    .then(response => {
+        const safetyStatusText = document.getElementById("safetyStatusText");
+        const safetyStatusDiv = document.getElementById("safetyStatus");
+
+        if (response.status === 403) {
+            return response.json().then(data => {
+                alert(data.message);
+                if (data.message.includes("Moderate")) {
+                    safetyStatusText.textContent = "Moderate";
+                    safetyStatusDiv.classList.remove("bg-green-50", "text-green-600");
+                    safetyStatusDiv.classList.add("bg-yellow-100", "text-yellow-800");
+                } else if (data.message.includes("Hard")) {
+                    safetyStatusText.textContent = "Hard";
+                    safetyStatusDiv.classList.remove("bg-green-50", "text-green-600");
+                    safetyStatusDiv.classList.add("bg-red-100", "text-red-700");
+                }
+            });
+        } else {
+            alert("Access granted.");
+            safetyStatusText.textContent = "Safe";
+            safetyStatusDiv.classList.remove("bg-yellow-100", "text-yellow-800", "bg-red-100", "text-red-700");
+            safetyStatusDiv.classList.add("bg-green-50", "text-green-600");
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+
+</script>

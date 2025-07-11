@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Golden Shield Website Activity</title>
+  <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='logo.png') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_website_activity.css') }}">
+</head>
+<body>
+
+<aside>
+  <div class="sidebar-top">
+    <a href="#" class="logo-link" aria-label="Golden Shield logo">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill="white" stroke="#2563eb"></path>
+      </svg>
+      <span class="logo-text">Golden Shield</span>
+    </a>
+    <p class="dashboard-label">Admin Website Activity</p>
+    <nav class="sidebar-nav" aria-label="Main navigation">
+      <a href="{{ url_for('admin_dashboard') }}">
+        <i class="fas fa-th-large" aria-hidden="true"></i>
+        <span>Dashboard</span>
+      </a>
+      <a href="{{ url_for('admin_senior_users') }}">
+        <i class="fas fa-user-friends" aria-hidden="true"></i>
+        <span>Senior Users</span>
+      </a>
+      <a href="{{ url_for('admin_website_activity') }}" class="active" aria-current="page">
+        <i class="fas fa-globe" aria-hidden="true"></i>
+        <span>Website Activity</span>
+      </a>
+      <a href="{{ url_for('admin_filtering_rules') }}">
+        <i class="fas fa-filter" aria-hidden="true"></i>
+        <span>Filtering Rules</span>
+      </a>
+      <a href="{{ url_for('admin_devices') }}">
+        <i class="fas fa-desktop" aria-hidden="true"></i>
+        <span>Devices</span>
+      </a>
+      <a href="{{ url_for('admin_notification') }}">
+        <i class="fas fa-bell" aria-hidden="true"></i>
+        <span>Notifications</span>
+      </a>
+      <a href="{{ url_for('admin_report') }}">
+        <i class="fas fa-file-alt" aria-hidden="true"></i>
+        <span>Reports</span>
+      </a>
+      <a href="{{ url_for('admin_setting') }}">
+        <i class="fas fa-cog" aria-hidden="true"></i>
+        <span>Settings</span>
+      </a>
+    </nav>
+  </div>
+  <div class="sidebar-bottom">
+    <a href="{{ url_for('logout') }}">
+      <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
+      <span>Logout</span>
+    </a>
+    <a href="#">
+      <i class="fas fa-user" aria-hidden="true"></i>
+      <span>Admin User</span>
+    </a>
+  </div>
+</aside>
+
+<main class="container">
+  <header>
+    <h1>Website Activity Monitor</h1>
+    <button type="button" class="export-btn" aria-label="Export Data" onclick="window.location.href='{{ url_for('export_data') }}'">
+      <i class="fas fa-download" aria-hidden="true"></i>
+      Export Data
+    </button>
+  </header>
+
+  <section class="activity-monitor" aria-labelledby="browsing-activity-title">
+    <h2 id="browsing-activity-title">
+      <i class="fas fa-globe" aria-hidden="true"></i>
+      Browsing Activity
+    </h2>
+
+    <form id="filterForm" class="filters" role="search" method="get" aria-label="Filter browsing activity">
+      <input
+        type="search"
+        name="search"
+        placeholder="Search activity..."
+        value="{{ request.args.get('search', '') }}"
+        oninput="submitForm()"
+      />
+
+      <select name="status" onchange="submitForm()">
+        {% set selected_status = request.args.get('status', 'All Statuses') %}
+        {% for status in ['All Statuses', 'Allowed', 'Blocked'] %}
+          <option value="{{ status }}" {% if selected_status == status %}selected{% endif %}>{{ status }}</option>
+        {% endfor %}
+      </select>
+
+      <select name="user" onchange="submitForm()">
+        {% set selected_user = request.args.get('user', 'All Users') %}
+        <option value="All Users" {% if selected_user == 'All Users' %}selected{% endif %}>All Users</option>
+        {% for user in users %}
+          <option value="{{ user }}" {% if selected_user == user %}selected{% endif %}>{{ user }}</option>
+        {% endfor %}
+      </select>
+    </form>
+
+    <script>
+      function submitForm() {
+        document.getElementById('filterForm').submit();
+      }
+    </script>
+
+    <div class="table-wrapper">
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Name</th>
+              <th scope="col">Website</th>
+              <th scope="col">Action</th>
+              <th scope="col">Time</th>
+              <th scope="col">Status</th>
+              <th scope="col">IP Address</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for log in logs %}
+            <tr>
+              <td>{{ log.fullname }}</td>
+              <td>
+                {% if log.website|length > 20 %}
+                  {{ log.website[:20] }}...
+                {% else %}
+                  {{ log.website }}
+                {% endif %}
+              </td>
+              <td>{{ log.action }}</td>
+              <td>{{ log.time }}</td>
+              <td>
+                <span class="status-{{ log.status|lower }}">{{ log.status }}</span>
+              </td>
+              <td>{{ log.ip }}</td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="6" style="text-align:center;">No browsing activity found.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </section>
+</main>
+</body>
+</html>
+
+<style>
+  .table-container {
+    max-height: 400px; /* Set the desired height */
+    overflow-y: auto;  /* Enable vertical scrolling */
+    border: 1px solid #ccc; /* Optional: Add a border for better visibility */
+    border-radius: 5px; /* Optional: Add rounded corners */
+  }
+
+  .table-container table {
+    width: 100%; /* Ensure the table takes full width */
+    border-collapse: collapse; /* Optional: Collapse borders for a cleaner look */
+  }
+
+  .table-container th, .table-container td {
+    padding: 10px; /* Add padding for table cells */
+    text-align: left; /* Align text to the left */
+  }
+
+  .table-container th {
+    background-color: #f2f2f2; /* Optional: Add a background color for headers */
+  }
+</style>

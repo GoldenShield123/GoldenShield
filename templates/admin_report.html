@@ -1,0 +1,390 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Golden Shield Admin Report</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='logo.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_report.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet"/>
+
+  <style>
+    .most-active-senior {
+      font-weight: bold;
+      color: grey;
+      margin-top: 5px;
+    }
+
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .day {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px;
+      border: 1px solid #ccc;
+    }
+
+    .today {
+      background-color: #2563eb; /* Highlight today's date */
+      color: white;
+    }
+
+    .empty {
+      width: 14.28%; /* 100% / 7 days */
+      height: 50px; /* Adjust height as needed */
+    }
+
+
+  </style>
+
+
+</head>
+<body>
+  <aside>
+    <div class="sidebar-top">
+      <a href="#" class="logo-link" aria-label="Golden Shield logo">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" >
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill="white" stroke="#2563eb"></path>
+        </svg>
+        <span class="logo-text">Golden Shield</span>
+      </a>
+      <p class="dashboard-label">Admin Report</p>
+      <nav class="sidebar-nav" aria-label="Main navigation">
+        <a href="{{ url_for('admin_dashboard') }}">
+          <i class="fas fa-th-large" aria-hidden="true"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="{{ url_for('admin_senior_users') }}">
+          <i class="fas fa-user-friends" aria-hidden="true"></i>
+          <span>Senior Users</span>
+        </a>
+        <a href="{{ url_for('admin_website_activity') }}">
+          <i class="fas fa-globe" aria-hidden="true"></i>
+          <span>Website Activity</span>
+        </a>
+        <a href="{{ url_for('admin_filtering_rules') }}">
+          <i class="fas fa-filter" aria-hidden="true"></i>
+          <span>Filtering Rules</span>
+        </a>
+        <a href="{{ url_for('admin_devices') }}">
+          <i class="fas fa-desktop" aria-hidden="true"></i>
+          <span>Devices</span>
+        </a>
+        <a href="{{ url_for('admin_notification') }}" >
+          <i class="fas fa-bell" aria-hidden="true"></i>
+          <span>Notifications</span>
+        </a>
+        <a href="{{ url_for('admin_report') }}" class="active" aria-current="page">
+          <i class="fas fa-file-alt" aria-hidden="true"></i>
+          <span>Reports</span>
+        </a>
+        <a href="{{ url_for('admin_setting') }}">
+          <i class="fas fa-cog" aria-hidden="true"></i>
+          <span>Settings</span>
+        </a>
+      </nav>
+    </div>
+    <div class="sidebar-bottom">
+      <a href="{{ url_for('logout') }}">
+        <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
+        <span>Logout</span>
+      </a>
+      <a href="#">
+        <i class="fas fa-user" aria-hidden="true"></i>
+        <span>Admin User</span>
+      </a>
+    </div>
+  </aside>
+
+  <main class="container">
+    <header class="header">
+      <h2>Reports</h2>
+      <button class="btn-select" aria-label="Select Last 7 Days">
+        <i class="far fa-clock"></i>
+        <span>Last 7 Days</span>
+        <i class="fas fa-chevron-down"></i>
+      </button>
+    </header>
+
+    <div class="grid-4" id="mainContent">
+      <div class="card">
+        <div>
+            <p class="card-text">Total Sites Visited</p>
+            <p class="card-number">{{ total_visits }}</p> <!-- Display total visits -->
+        </div>
+        <div class="icon-circle icon-blue" aria-hidden="true">
+            <i class="fas fa-globe"></i>
+        </div>
+    </div>
+
+      <div class="card">
+        <div>
+            <p class="card-text">Sites Blocked</p>
+            <p class="card-number">{{ blocked_sites_count }}</p> <!-- Updated to display the count -->
+        </div>
+        <div class="icon-circle icon-red" aria-hidden="true">
+            <i class="fas fa-shield-alt"></i>
+        </div>
+      </div>
+
+      <div class="card">
+        <div>
+            <p class="card-text">Top Blocked Category</p>
+            <p class="card-number" style="font-size: 1.25rem; font-weight: 800;">{{ top_blocked_category.category }}</p>
+        </div>
+        <div class="icon-circle icon-yellow" aria-hidden="true">
+            <i class="fas fa-clock"></i>
+        </div>
+      </div>
+
+      <div class="card">
+        <div>
+            <p class="card-text">Most Active Senior</p>
+            <p class="card-number" style="font-size: 1.25rem; font-weight: 800;">{{ most_active_senior.fullname }}</p>
+        </div>
+        <div class="icon-circle icon-green" aria-hidden="true">
+            <i class="fas fa-user-friends"></i>
+        </div>
+      </div>
+    </div>
+
+    <nav class="tabs" role="tablist" aria-label="Report view selection">
+      <button class="tab-button" role="tab" aria-selected="false" tabindex="-1" data-tab="summary">
+        <i class="fas fa-chart-bar" aria-hidden="true"></i>
+        Summary
+      </button>
+      <button class="tab-button" role="tab" aria-selected="false" tabindex="-1" data-tab="export">
+        <i class="fas fa-file-download" aria-hidden="true"></i>
+        Export Reports
+      </button>
+      <button class="tab-button" role="tab" aria-selected="false" tabindex="-1" data-tab="calendar">
+        <i class="fas fa-calendar-alt" aria-hidden="true"></i>
+        Calendar View
+      </button>
+    </nav>
+
+    <div class="grid-2" id="summaryContent" style="display:none;">
+      <section aria-labelledby="most-blocked-categories-title">
+        <h3 id="most-blocked-categories-title">Most Blocked Categories</h3>
+        <ul>
+            {% for category in most_blocked_categories %}
+                <li>
+                    <span class="category-name">{{ category.category }}</span>
+                    <div style="display:flex; align-items:center;">
+                        <span class="badge badge-red">{{ category.count }} blocks</span>
+                        <div class="bar-container" aria-hidden="true">
+                            <div class="bar-red" style="width: {{ (category.count / 100) * 100 }}%;"></div>
+                        </div>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+      </section>
+
+      <section aria-labelledby="most-active-seniors-title">
+        <h3 id="most-active-seniors-title">Most Active Seniors</h3>
+        <ul>
+            {% for senior in most_active_seniors %}
+              <li>
+                  <span class="senior-name">{{ senior.fullname }}</span>
+                  <div style="display:flex; align-items:center;">
+                      <span class="badge badge-blue">{{ senior.visit_count }} visits</span>
+                      <div class="bar-container" aria-hidden="true">
+                          <div class="bar-blue" style="width: {{ (senior.visit_count / 5000) * 100 }}%;"></div>
+                      </div>
+                  </div>
+              </li>
+          {% endfor %}
+        </ul>
+      </section>
+    </div>
+
+    <div class="export-container" id="exportContent" aria-label="Export Reports" role="region" aria-hidden="true">
+      <h2>Export Reports</h2>
+      <div class="flex-row">
+        <div class="left">
+          <h3>Report Type</h3>
+          <div class="grid">
+            <div class="card-export">
+              <p class="card-title">Browsing Timeline</p>
+              <p class="card-subtitle">Activity per senior user</p>
+            </div>
+            <div class="card-export">
+              <p class="card-title">Devices Used</p>
+              <p class="card-subtitle">Device activity summary</p>
+            </div>
+            <div class="card-export">
+              <p class="card-title">Filtering Changes</p>
+              <p class="card-subtitle">Filter level modifications</p>
+            </div>
+            <div class="card-export">
+              <p class="card-title">IP Tracking Log</p>
+              <p class="card-subtitle">Location data summary</p>
+            </div>
+          </div>
+        </div>
+        <div class="right">
+          <h3>Export Format</h3>
+          <select aria-label="Export Format">
+            <option>DOCX Document</option>
+          </select>
+          <button type="button" onclick="window.location.href='{{ url_for('export_reports') }}'" class="export-btn">
+              <i class="fas fa-download" aria-hidden="true"></i>
+              <span>Export All Reports</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="calendar-container" id="calendarContent" aria-label="Calendar View" role="region" aria-hidden="true">
+      <h2>Calendar View</h2>
+      <div class="calendar-header">
+        <button id="prevMonth" aria-label="Previous Month">&lt;</button>
+        <h3 id="currentMonth"></h3>
+        <button id="nextMonth" aria-label="Next Month">&gt;</button>
+      </div>
+      <div class="weekdays">
+        <div>Sun</div>
+        <div>Mon</div>
+        <div>Tue</div>
+        <div>Wed</div>
+        <div>Thu</div>
+        <div>Fri</div>
+        <div>Sat</div>
+      </div>
+      <div class="days" id="daysContainer"></div>
+      <p class="note">Click on a day to view detailed activity for that date</p>
+    </div>
+
+
+  </main>
+
+  <script>
+    const tabs = document.querySelectorAll('.tab-button');
+    const summaryContent = document.getElementById('summaryContent');
+    const exportContent = document.getElementById('exportContent');
+    const calendarContent = document.getElementById('calendarContent');
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        if (tab.classList.contains('active')) return;
+
+        tabs.forEach(t => {
+          t.classList.remove('active');
+          t.setAttribute('aria-selected', 'false');
+          t.setAttribute('tabindex', '-1');
+        });
+
+        tab.classList.add('active');
+        tab.setAttribute('aria-selected', 'true');
+        tab.setAttribute('tabindex', '0');
+
+        const selected = tab.getAttribute('data-tab');
+
+        if (selected === 'export') {
+          exportContent.setAttribute('aria-hidden', 'false');
+          exportContent.classList.add('active');
+          summaryContent.style.display = 'none';
+          calendarContent.setAttribute('aria-hidden', 'true');
+          calendarContent.classList.remove('active');
+        } else if (selected === 'calendar') {
+          calendarContent.setAttribute('aria-hidden', 'false');
+          calendarContent.classList.add('active');
+          summaryContent.style.display = 'none';
+          exportContent.setAttribute('aria-hidden', 'true');
+          exportContent.classList.remove('active');
+        } else {
+          summaryContent.style.display = 'grid';
+          exportContent.setAttribute('aria-hidden', 'true');
+          exportContent.classList.remove('active');
+          calendarContent.setAttribute('aria-hidden', 'true');
+          calendarContent.classList.remove('active');
+        }
+      });
+    });
+  </script>
+
+
+
+<script>
+ const daysContainer = document.getElementById('daysContainer');
+const currentMonthLabel = document.getElementById('currentMonth');
+const prevMonthButton = document.getElementById('prevMonth');
+const nextMonthButton = document.getElementById('nextMonth');
+
+let currentDate = new Date();
+
+// Example data structure for most visited sites by date
+const mostVisitedSitesByDate = {{ most_visited_sites_by_date | tojson }};
+
+function renderCalendar() {
+  // Clear previous days
+  daysContainer.innerHTML = '';
+
+  // Get the current month and year
+  const month = currentDate.getMonth();
+  const year = currentDate.getFullYear();
+
+  // Set the month label
+  currentMonthLabel.textContent = currentDate.toLocaleString('default', { month: 'long', year: 'numeric' });
+
+  // Get the first day of the month
+  const firstDay = new Date(year, month, 1).getDay();
+  // Get the total days in the month
+  const totalDays = new Date(year, month + 1, 0).getDate();
+
+  // Create empty divs for days of the previous month
+  for (let i = 0; i < firstDay; i++) {
+    daysContainer.innerHTML += '<div class="empty"></div>';
+  }
+
+  // Create divs for each day of the current month
+  for (let day = 1; day <= totalDays; day++) {
+    const dayDiv = document.createElement('div');
+    dayDiv.className = 'day';
+    dayDiv.innerHTML = `<div class="day-number">${day}</div>`;
+
+    // Highlight today's date
+    if (day === currentDate.getDate() && month === new Date().getMonth() && year === new Date().getFullYear()) {
+      dayDiv.classList.add('today');
+    }
+
+    // Format the date to match the keys in the mostVisitedSitesByDate object
+    const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+
+    // Check if there is a most visited site for this date
+    if (mostVisitedSitesByDate[dateKey]) {
+      const site = mostVisitedSitesByDate[dateKey];
+      dayDiv.innerHTML += `<div class="most-active-senior">Most Visited: <a href="${site.url}" target="_blank">${site.title}</a> (${site.visit_count} visits)</div>`;
+    } else {
+      dayDiv.innerHTML += `<div class="most-active-senior">Most Visited: </div>`; // Leave blank if none
+    }
+
+    daysContainer.appendChild(dayDiv);
+  }
+}
+
+// Event listeners for month navigation
+prevMonthButton.addEventListener('click', () => {
+  currentDate.setMonth(currentDate.getMonth() - 1);
+  renderCalendar();
+});
+
+nextMonthButton.addEventListener('click', () => {
+  currentDate.setMonth(currentDate.getMonth() + 1);
+  renderCalendar();
+});
+
+// Initial render
+renderCalendar();
+
+
+</script>
+</body>
+</html>

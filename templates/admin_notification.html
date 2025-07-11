@@ -1,0 +1,190 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Golden Shield Admin Notification</title>
+  <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='logo.png') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_notification.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet"/>
+</head>
+<body>
+  <aside>
+    <div class="sidebar-top">
+      <a href="#" class="logo-link" aria-label="Golden Shield logo">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" >
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill="white" stroke="#2563eb"></path>
+        </svg>
+        <span class="logo-text">Golden Shield</span>
+      </a>
+      <p class="dashboard-label">Admin Notification</p>
+      <nav class="sidebar-nav" aria-label="Main navigation">
+        <a href="{{ url_for('admin_dashboard') }}">
+          <i class="fas fa-th-large" aria-hidden="true"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="{{ url_for('admin_senior_users') }}">
+          <i class="fas fa-user-friends" aria-hidden="true"></i>
+          <span>Senior Users</span>
+        </a>
+        <a href="{{ url_for('admin_website_activity') }}">
+          <i class="fas fa-globe" aria-hidden="true"></i>
+          <span>Website Activity</span>
+        </a>
+        <a href="{{ url_for('admin_filtering_rules') }}">
+          <i class="fas fa-filter" aria-hidden="true"></i>
+          <span>Filtering Rules</span>
+        </a>
+        <a href="{{ url_for('admin_devices') }}">
+          <i class="fas fa-desktop" aria-hidden="true"></i>
+          <span>Devices</span>
+        </a>
+        <a href="{{ url_for('admin_notification') }}" class="active" aria-current="page">
+          <i class="fas fa-bell" aria-hidden="true"></i>
+          <span>Notifications</span>
+        </a>
+        <a href="{{ url_for('admin_report') }}">
+          <i class="fas fa-file-alt" aria-hidden="true"></i>
+          <span>Reports</span>
+        </a>
+        <a href="{{ url_for('admin_setting') }}">
+          <i class="fas fa-cog" aria-hidden="true"></i>
+          <span>Settings</span>
+        </a>
+      </nav>
+    </div>
+    <div class="sidebar-bottom">
+      <a href="{{ url_for('logout') }}">
+        <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
+        <span>Logout</span>
+      </a>
+      <a href="#">
+        <i class="fas fa-user" aria-hidden="true"></i>
+        <span>Admin User</span>
+      </a>
+    </div>
+  </aside>
+
+  <main class="container">
+    <header>
+      <h1>Notifications Panel</h1>
+      <button class="settings-btn" type="button" aria-label="Notification Settings" onclick="window.location.href='{{ url_for('admin_setting') }}?tab=notification-settings'">
+        <i class="fas fa-cog" aria-hidden="true"></i>
+        Notification Settings
+      </button>
+    </header>
+
+    <section class="panel" aria-label="Real-time Alerts">
+      <h2 class="panel-title">
+        <i class="far fa-bell" aria-hidden="true"></i>
+        Real-time Alerts
+      </h2>
+
+      <form class="filters" aria-label="Filters" id="notificationFilters">
+        <input
+            type="search"
+            placeholder="Search notifications..."
+            aria-label="Search notifications"
+            id="searchInput"
+        />
+        <select aria-label="Filter by Risks" id="riskFilter">
+            <option value="all">All Risks</option>
+        </select>
+        <select aria-label="Filter by Seniors" id="seniorFilter">
+            <option value="all">All Seniors</option>
+        </select>
+        <select aria-label="Filter by Dates" id="dateFilter">
+            <option value="all">All Dates</option>
+        </select>
+      </form>
+
+      <div id="notificationList">
+          {% for notification in notifications %}
+          <article class="alert" data-risk="{{ notification.type_risk|lower }}" aria-label="{{ notification.type }}">
+              <header>
+                  <h3>
+                      <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
+                      {{ notification.type }} from {{ notification.email }}
+                  </h3>
+                  <div class="risk-review-container">
+                      <span class="risk-badge risk-{{ notification.type_risk|lower }}">{{ notification.type_risk }} Risk</span>
+                  </div>
+              </header>
+              <dl class="details">
+                  <div>
+                      <dt>Date</dt>
+                      <dd>{{ notification.date }}</dd>
+                  </div>
+                  <div>
+                      <dt>Website</dt>
+                      <dd>{{ notification.website }}</dd>
+                  </div>
+                  <div>
+                      <dt>Type</dt>
+                      <dd>{{ notification.type }}</dd>
+                  </div>
+                  <div>
+                      <dt>Email</dt>
+                      <dd>{{ notification.email }}</dd>
+                  </div>
+              </dl>
+          </article>
+          {% endfor %}
+      </div>
+
+    </section>
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const riskFilter = document.getElementById('riskFilter');
+        const seniorFilter = document.getElementById('seniorFilter');
+        const dateFilter = document.getElementById('dateFilter');
+        const notificationList = document.getElementById('notificationList');
+
+        function filterNotifications() {
+            const riskValue = riskFilter.value.toLowerCase();
+            const seniorValue = seniorFilter.value;
+            const dateValue = dateFilter.value;
+
+            const notifications = notificationList.querySelectorAll('.alert');
+
+            notifications.forEach(notification => {
+                const notificationRisk = notification.getAttribute('data-risk');
+                const notificationDate = notification.querySelector('dd:nth-child(1)').innerText; // Assuming date is the first dd
+                const notificationEmail = notification.querySelector('dd:nth-child(4)').innerText; // Assuming email is the fourth dd
+
+                let showNotification = true;
+
+                // Filter by risk
+                if (riskValue !== 'all' && notificationRisk !== riskValue) {
+                    showNotification = false;
+                }
+
+                // Filter by senior
+                if (seniorValue !== 'all' && notificationEmail !== seniorValue) {
+                    showNotification = false;
+                }
+
+                // Filter by date
+                const today = new Date();
+                const notificationDateObj = new Date(notificationDate);
+                if (dateValue === 'today' && notificationDateObj.toDateString() !== today.toDateString()) {
+                    showNotification = false;
+                } else if (dateValue === 'yesterday' && notificationDateObj.toDateString() !== new Date(today.setDate(today.getDate() - 1)).toDateString()) {
+                    showNotification = false;
+                } else if (dateValue === 'last7' && (today - notificationDateObj) > (7 * 24 * 60 * 60 * 1000)) {
+                    showNotification = false;
+                }
+
+                notification.style.display = showNotification ? 'block' : 'none';
+            });
+        }
+
+        riskFilter.addEventListener('change', filterNotifications);
+        seniorFilter.addEventListener('change', filterNotifications);
+        dateFilter.addEventListener('change', filterNotifications);
+    });
+  </script>
+</body>
+</html>

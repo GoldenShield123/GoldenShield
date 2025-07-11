@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "475759246719",
+    "firebase_url": "https://goldenshield-01-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "goldenshield-01",
+    "storage_bucket": "goldenshield-01.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:475759246719:android:525e97e8c357f97316ee4a",
+        "android_client_info": {
+          "package_name": "com.company.goldenshield"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBXMD29eWiNcMxr2TW6_IGBDkhHO1J1a0E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

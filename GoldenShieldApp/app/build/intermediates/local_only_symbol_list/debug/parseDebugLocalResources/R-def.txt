@@ -1,0 +1,23 @@
+R_DEF: Internal format may change without notice
+local
+drawable logo
+id browserButton
+id historyList
+id refreshButton
+id webView
+layout activity_main
+layout activity_webview
+string app_name
+string browser_button
+string browsing_history_label
+string firebase_database_url
+string gcm_defaultSenderId
+string google_api_key
+string google_app_id
+string google_crash_reporting_api_key
+string google_storage_bucket
+string project_id
+string refresh_button
+string toast_history_fail
+string toast_refresh_fail
+string toast_refresh_success

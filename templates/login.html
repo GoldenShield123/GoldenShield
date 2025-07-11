@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Golden Shield Login</title>
+  <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='logo.png') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/login_design.css') }}" />
+  <style>
+    /* Add styles for popup message */
+    .popup-message {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+      display: none;
+    }
+    .hero-background {
+
+    }
+
+  </style>
+</head>
+<body>
+
+  <header>
+    <a href="{{ url_for('landing') }}" style="text-decoration: none;">
+        <div class="logo">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          </svg>
+          <span>Golden Shield</span>
+        </div>
+    </a>
+  </header>
+  <main>
+
+    <form method="POST" action="{{ url_for('login') }}" aria-label="Login form">
+      <h1>Welcome Back</h1>
+
+      <div class="toggle-buttons">
+        <a href="{{ url_for('login') }}" class="login">Login</a>
+        <a href="{{ url_for('create_account') }}" class="create-account">Create Account</a>
+      </div>
+
+      <label for="email">Email</label>
+      <input id="email" name="email" type="email" placeholder="Enter your email" autocomplete="email" required />
+
+      <label for="password">Password</label>
+      <input id="password" name="password" type="password" placeholder="Enter your password" autocomplete="current-password" required />
+
+      <button type="submit" class="submit">Login</button>
+    </form>
+
+    <!-- Countdown Timer -->
+    <div id="countdown" style="color: red; font-weight: bold;"></div>
+  </main>
+
+  <!-- Flash Message Popup -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <script>
+        {% for category, message in messages %}
+          alert("{{ message }}");
+        {% endfor %}
+      </script>
+    {% endif %}
+  {% endwith %}
+
+  <script>
+    // Auto-remove flash messages after animation
+    setTimeout(() => {
+      const container = document.querySelector('.popup-message');
+      if (container) {
+        container.style.display = 'block';
+        setTimeout(() => {
+          container.remove();
+        }, 4000);
+      }
+    }, 100);
+
+    // Countdown logic
+    window.onload = function() {
+      const remainingTime = {{ remaining_time | default(0) }};
+      if (remainingTime > 0) {
+        const countdownElement = document.getElementById('countdown');
+        let timeLeft = remainingTime;
+
+        const countdownInterval = setInterval(function() {
+          if (timeLeft <= 0) {
+            clearInterval(countdownInterval);
+            window.location.reload(); // Refresh the page when time is up
+          } else {
+            countdownElement.innerText = timeLeft + " seconds remaining";
+            timeLeft--;
+          }
+        }, 1000);
+      }
+    };
+  </script>
+
+</body>
+
+<script>
+  document.querySelector('.create-account').addEventListener('click', function () {
+    window.location.href = "{{ url_for('create_account') }}";
+  });
+</script>
+
+</html>

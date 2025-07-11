@@ -1,0 +1,50 @@
+{
+  "manifest_version": 3,
+
+  "name": "Golden Shield",
+  "description": "Trying to save your Children and help them to use internet wisely.",
+  "version": "1.0",
+
+  "icons": {
+    "48": "logo.png"
+  },
+
+  "permissions": [
+    "storage",
+    "declarativeNetRequest",
+    "declarativeNetRequestWithHostAccess"
+  ],
+
+  "host_permissions": [
+    "http://localhost:5000/*",
+    "<all_urls>"
+  ],
+
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "logo.png"
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["jquery-3.4.0.min.js", "hide-content.js"],
+      "run_at": "document_end"
+    }
+  ],
+
+  "declarative_net_request": {
+    "rule_resources": [
+      {
+        "id": "ruleset_1",
+        "enabled": true,
+        "path": "rules.json"
+      }
+    ]
+  }
+}

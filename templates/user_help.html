@@ -1,0 +1,322 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Golden Shield User Help</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='logo.png') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet"/>
+  <style>
+    body {
+      font-family: "Inter", sans-serif;
+      margin: 0;
+      padding-bottom: 64px; /* space for fixed bottom footer */
+      background-color: #e6f0ff;
+      color: black;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    main {
+      flex-grow: 1;
+      max-width: 768px; /* max width for larger screens */
+      margin-left: auto;
+      margin-right: auto;
+      padding: 1.5rem;
+      width: 100%;
+      box-sizing: border-box;
+      overflow-y: auto;
+      transition: transform 0.2s ease;
+      transform-origin: top center;
+    }
+    footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background-color: white;
+      border-top: 1px solid #e6e8f0;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 0.75rem 0;
+      text-align: center;
+      font-size: 0.75rem;
+      color: #374151; /* text-slate-900 */
+      z-index: 10;
+    }
+    footer button {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0.5rem 1.25rem;
+      font-size: 0.875rem;
+      color: #374151;
+      background: none;
+      border: none;
+      cursor: pointer;
+      border-radius: 0.5rem;
+      transition: background-color 0.2s ease;
+    }
+    footer button[aria-current="page"] {
+      color: #2563eb;
+      font-weight: 600;
+      background-color: rgba(37, 99, 235, 0.125);
+    }
+    footer button:hover:not([aria-current="page"]) {
+      background-color: #f3f4f6;
+    }
+    footer button i {
+      margin-bottom: 0.25rem;
+      font-size: 1.25rem;
+    }
+    @media (min-width: 640px) {
+      footer {
+        font-size: 0.875rem;
+        padding: 1rem 0;
+      }
+      footer button {
+        padding: 0.75rem 1.25rem;
+        font-size: 1rem;
+      }
+      footer button i {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+  <script>
+    let zoomLevel = 1;
+    function zoomContent(increment) {
+      zoomLevel += increment;
+      if (zoomLevel < 0.5) zoomLevel = 0.5;
+      if (zoomLevel > 3) zoomLevel = 3;
+      const main = document.querySelector("main");
+      main.style.transform = `scale(${zoomLevel})`;
+      const zoomText = document.getElementById("zoomText");
+      if (zoomText) {
+        zoomText.textContent = Math.round(zoomLevel * 100) + "%";
+      }
+    }
+
+    // Narration logic
+    function narrateDescriptions() {
+      const descriptions = [
+        "Getting Started with Golden Shield: Golden Shield is a website filtering and monitoring system designed to keep you safe online. Your guardian has set up this system to protect you from harmful websites and content. The main features you'll see on your home screen are Safety Status, Filter Level, Recent Safe Sites, and Help and FAQ buttons for assistance.",
+        "Understanding Filter Levels: Golden Shield has three filter levels: Easy, which is basic protection blocking only the most harmful websites; Moderate, which is standard protection blocking potentially harmful websites; and Hard, which is maximum protection allowing only specifically approved websites. Your guardian sets your filter level based on your needs.",
+        "Why Can't I Access Certain Websites?: If you try to visit a website and see a message that it's blocked, it means Golden Shield has determined the website may be harmful or inappropriate. Websites can be blocked for reasons such as adult content, malware, gambling, or not being on your guardian's approved list if using the Hard filter level. If you believe a website is blocked incorrectly, please use the FAQ chatbot or contact your guardian.",
+        "Using the Voice Assistant: Golden Shield includes a voice assistant feature to help you use the system more easily. The voice assistant can read text on the screen for you. To use it, click the speaker icon in the top right corner to activate, click speaker icons next to text to have that text read aloud, and in the FAQ section, all assistant responses have a speaker icon you can click to hear the response.",
+        "Emergency Contact: If you need immediate assistance, you can use the Emergency Contact feature to quickly reach your guardian. Click the red phone icon in the top right corner of any screen to see a list of emergency contacts with options to call or text them. Click Call to immediately place a phone call to your guardian. This feature is always available from any screen in Golden Shield."
+      ];
+
+      // Use Web Speech API to speak descriptions sequentially
+      if (!('speechSynthesis' in window)) {
+        alert("Sorry, your browser does not support speech synthesis.");
+        return;
+      }
+
+      const synth = window.speechSynthesis;
+      synth.cancel(); // Cancel any ongoing speech
+
+      let index = 0;
+
+      function speakNext() {
+        if (index >= descriptions.length) return;
+        const utterance = new SpeechSynthesisUtterance(descriptions[index]);
+        utterance.rate = 1;
+        utterance.pitch = 1;
+        utterance.onend = () => {
+          index++;
+          speakNext();
+        };
+        synth.speak(utterance);
+      }
+
+      speakNext();
+    }
+  </script>
+</head>
+<body>
+  <header class="flex items-center justify-between px-4 sm:px-6 md:px-8 py-4 border-b border-gray-200 bg-white">
+    <div class="flex items-center space-x-2">
+      <svg class="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 2L4 5v6c0 5.25 3.75 10 8 11 4.25-1 8-5.75 8-11V5l-8-3z"></path>
+      </svg>
+      <span class="font-semibold text-blue-600 text-base sm:text-lg select-none">Golden Shield</span>
+    </div>
+    <nav class="flex items-center space-x-2 sm:space-x-4 text-blue-600">
+      <button aria-label="Menu" class="text-blue-600 hover:text-blue-700 focus:outline-none">
+        <i class="fas fa-list-ul fa-lg"></i>
+      </button>
+      <button aria-label="Zoom out" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-blue-200 flex items-center justify-center text-blue-600 hover:bg-blue-50 focus:outline-none" onclick="zoomContent(-0.1)">
+        <span class="text-xl sm:text-2xl leading-none select-none">−</span>
+      </button>
+      <div class="hidden sm:flex items-center space-x-2 px-2 select-none">
+        <div class="w-14 h-3 rounded-full bg-blue-200 relative">
+          <div class="absolute top-0 left-0 h-3 w-7 rounded-full bg-blue-600" style="left: 25%;"></div>
+        </div>
+      </div>
+      <button aria-label="Zoom in" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-blue-200 flex items-center justify-center text-blue-600 hover:bg-blue-50 focus:outline-none" onclick="zoomContent(0.1)">
+        <span class="text-xl sm:text-2xl leading-none select-none">+</span>
+      </button>
+      <span id="zoomText" class="text-xs sm:text-sm select-none">100%</span>
+      <button aria-label="Sound" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full border border-blue-300 flex items-center justify-center text-blue-600 hover:bg-blue-50 focus:outline-none" onclick="narrateDescriptions()">
+        <i class="fas fa-volume-up fa-lg"></i>
+      </button>
+      <button aria-label="Call" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full border border-red-300 flex items-center justify-center text-red-400 hover:bg-red-50 focus:outline-none">
+        <i class="fas fa-phone fa-lg"></i>
+      </button>
+    </nav>
+  </header>
+
+  <main class="flex-grow p-6 max-w-7xl mx-auto bg-[#eaf3ff] min-h-screen">
+    <div class="max-w-5xl mx-auto">
+      <section class="mt-6 rounded-lg border border-[#a9c5ff] bg-white p-8" aria-label="Help Guide Section">
+        <h1 class="flex items-center gap-2 text-2xl font-extrabold text-black mb-3">
+          <span class="flex justify-center items-center rounded-full border-2 border-[#2a6de0] text-[#2a6de0] font-bold w-8 h-8" aria-hidden="true">
+            ?
+          </span>
+          Help Guide
+        </h1>
+        <p class="text-base font-normal text-black mb-8 max-w-3xl">
+          Welcome to the Golden Shield Help Guide. Here you'll find information on
+          how to use the system and troubleshoot common issues.
+        </p>
+
+        <div class="divide-y divide-gray-300 max-w-3xl" id="accordion">
+          <details class="py-4" open>
+            <summary class="flex items-center justify-between cursor-pointer font-semibold text-base text-black select-none">
+              <span class="flex items-center gap-2">
+                Getting Started with Golden Shield
+                <i class="fas fa-volume-up text-black text-sm"></i>
+              </span>
+              <i class="fas fa-chevron-down text-black"></i>
+            </summary>
+            <div class="mt-4 text-black text-base font-normal space-y-2">
+              <p>
+                Golden Shield is a website filtering and monitoring system designed to keep you safe online. Your guardian has set up this system to protect you from harmful websites and content.
+              </p>
+              <p>The main features you'll see on your home screen are:</p>
+              <ul class="list-disc list-inside space-y-1">
+                <li>Safety Status - Shows if your browsing is currently safe</li>
+                <li>Filter Level - The current protection level set by your guardian</li>
+                <li>Recent Safe Sites - A list of websites you've visited that are safe</li>
+                <li>Help and FAQ buttons - For when you need assistance</li>
+              </ul>
+            </div>
+          </details>
+
+          <details class="py-4">
+            <summary class="flex items-center justify-between cursor-pointer font-semibold text-base text-black select-none">
+              <span class="flex items-center gap-2">
+                Understanding Filter Levels
+                <i class="fas fa-volume-up text-black text-sm"></i>
+              </span>
+              <i class="fas fa-chevron-down text-black"></i>
+            </summary>
+            <div class="mt-4 text-black text-base font-normal space-y-2">
+              <p>Golden Shield has three filter levels:</p>
+              <ul class="list-disc list-inside space-y-1">
+                <li>Easy (Green) - Basic protection that blocks only the most harmful websites</li>
+                <li>Moderate (Yellow) - Standard protection that blocks potentially harmful websites</li>
+                <li>Hard (Red) - Maximum protection that only allows specifically approved websites</li>
+              </ul>
+              <p>Your guardian sets your filter level based on your needs. If you think your filter level is too restrictive, please contact your guardian.</p>
+            </div>
+          </details>
+
+          <details class="py-4">
+            <summary class="flex items-center justify-between cursor-pointer font-semibold text-base text-black select-none">
+              <span class="flex items-center gap-2">
+                Why Can't I Access Certain Websites?
+                <i class="fas fa-volume-up text-black text-sm"></i>
+              </span>
+              <i class="fas fa-chevron-down text-black"></i>
+            </summary>
+            <div class="mt-4 text-black text-base font-normal space-y-2">
+              <p>
+                If you try to visit a website and see a message that it's blocked, this means Golden Shield has determined the website may be harmful or inappropriate.
+              </p>
+              <p>Websites can be blocked for several reasons:</p>
+              <ul class="list-disc list-inside space-y-1">
+                <li>The website contains adult content</li>
+                <li>The website may contain malware or viruses</li>
+                <li>The website is related to gambling or other restricted activities</li>
+                <li>The website is not on your guardian's approved list (if using Hard filter level)</li>
+              </ul>
+              <p>If you believe a website has been blocked incorrectly, please use the FAQ chatbot or contact your guardian.</p>
+            </div>
+          </details>
+
+          <details class="py-4">
+            <summary class="flex items-center justify-between cursor-pointer font-semibold text-base text-black select-none">
+              <span class="flex items-center gap-2">
+                Using the Voice Assistant
+                <i class="fas fa-volume-up text-black text-sm"></i>
+              </span>
+              <i class="fas fa-chevron-down text-black"></i>
+            </summary>
+            <div class="mt-4 text-black text-base font-normal space-y-2">
+              <p>
+                Golden Shield includes a voice assistant feature to help you use the system more easily. The voice assistant can read text on the screen for you.
+              </p>
+              <p>To use the voice assistant:</p>
+              <ul class="list-disc list-inside space-y-1">
+                <li>Click the speaker icon () in the top right corner of the screen to activate the voice assistant</li>
+                <li>Click the speaker icons next to text to have that specific text read aloud</li>
+                <li>In the FAQ section, all assistant responses have a speaker icon you can click to hear the response</li>
+              </ul>
+              <p>The voice assistant is designed to make Golden Shield more accessible and easier to use.</p>
+            </div>
+          </details>
+
+          <details class="py-4">
+            <summary class="flex items-center justify-between cursor-pointer font-semibold text-base text-black select-none">
+              <span class="flex items-center gap-2">
+                Emergency Contact
+                <i class="fas fa-volume-up text-black text-sm"></i>
+              </span>
+              <i class="fas fa-chevron-down text-black"></i>
+            </summary>
+            <div class="mt-4 text-black text-base font-normal space-y-2">
+              <p>
+                If you need immediate assistance, you can use the Emergency Contact feature to quickly reach your guardian.
+              </p>
+              <p>To access Emergency Contact:</p>
+              <ul class="list-disc list-inside space-y-1">
+                <li>Click the red phone icon () in the top right corner of any screen</li>
+                <li>You'll see a list of your emergency contacts with options to call or text them</li>
+                <li>Click "Call" to immediately place a phone call to your guardian</li>
+              </ul>
+              <p>The Emergency Contact feature is always available from any screen in Golden Shield.</p>
+            </div>
+          </details>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="fixed bottom-0 left-0 w-full bg-white border-t border-[#e6e8f0] flex justify-around items-center py-3 text-center text-xs sm:text-sm text-slate-900 z-10">
+    <a href="{{ url_for('user_dashboard') }}"  class="flex flex-col items-center px-4 py-2 sm:px-5 sm:py-3">
+      <i class="fas fa-home mb-1"></i>
+      Home
+    </a>
+    <a href="{{ url_for('user_setting') }}" class="flex flex-col items-center px-4 py-2 sm:px-5 sm:py-3">
+      <i class="fas fa-cog mb-1"></i>
+      Settings
+    </a>
+    <a href="{{ url_for('user_help') }}" class="flex flex-col items-center text-[#2563eb] font-semibold bg-[#2563eb] bg-opacity-20 rounded-lg px-4 py-2 sm:px-5 sm:py-3">
+      <i class="fas fa-question-circle mb-1"></i>
+      Help
+    </a>
+    <a href="{{ url_for('user_FAQ') }}" class="flex flex-col items-center px-4 py-2 sm:px-5 sm:py-3">
+      <i class="far fa-comment-alt mb-1"></i>
+      FAQ
+    </a>
+    <a href="{{ url_for('logout') }}" class="flex flex-col items-center px-4 py-2 sm:px-5 sm:py-3">
+      <i class="fas fa-sign-out-alt mb-1"></i>
+      Logout
+    </a>
+  </footer>
+</body>
+</html>

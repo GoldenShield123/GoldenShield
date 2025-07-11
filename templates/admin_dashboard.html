@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Golden Shield Admin Dashboard</title>
+  <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='logo.png') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_dashboard.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+
+
+</head>
+<body>
+  <aside>
+    <div class="sidebar-top">
+      <a href="#" class="logo-link" aria-label="Golden Shield logo">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" >
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+        </svg>
+        <span class="logo-text">Golden Shield</span>
+      </a>
+      <p class="dashboard-label">Admin Dashboard</p>
+      <nav class="sidebar-nav" aria-label="Main navigation">
+        <a href="{{ url_for('admin_dashboard') }}" class="active" aria-current="page">
+          <i class="fas fa-th-large" aria-hidden="true"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="{{ url_for('admin_senior_users') }}">
+          <i class="fas fa-user-friends" aria-hidden="true"></i>
+          <span>Senior Users</span>
+        </a>
+        <a href="{{ url_for('admin_website_activity') }}">
+          <i class="fas fa-globe" aria-hidden="true"></i>
+          <span>Website Activity</span>
+        </a>
+        <a href="{{ url_for('admin_filtering_rules') }}">
+          <i class="fas fa-filter" aria-hidden="true"></i>
+          <span>Filtering Rules</span>
+        </a>
+        <a href="{{ url_for('admin_devices') }}">
+          <i class="fas fa-desktop" aria-hidden="true"></i>
+          <span>Devices</span>
+        </a>
+        <a href="{{ url_for('admin_notification') }}">
+          <i class="fas fa-bell" aria-hidden="true"></i>
+          <span>Notifications</span>
+        </a>
+        <a href="{{ url_for('admin_report') }}">
+          <i class="fas fa-file-alt" aria-hidden="true"></i>
+          <span>Reports</span>
+        </a>
+        <a href="{{ url_for('admin_setting') }}">
+          <i class="fas fa-cog" aria-hidden="true"></i>
+          <span>Settings</span>
+        </a>
+      </nav>
+    </div>
+    <div class="sidebar-bottom">
+      <a href="{{ url_for('logout') }}">
+        <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
+        <span>Logout</span>
+      </a>
+      <a href="#">
+        <i class="fas fa-user" aria-hidden="true"></i>
+        <span>Admin User</span>
+      </a>
+    </div>
+  </aside>
+
+  <main>
+    <section>
+      <h2 class="section-title">Dashboard Overview</h2>
+      <div class="cards-grid">
+        <div class="card">
+            <div class="card-text">
+                <p class="card-label">Senior Users</p>
+                <p class="card-value">{{ senior_user_count }}</p>
+            </div>
+            <div class="icon-circle icon-blue" aria-hidden="true">
+                <i class="fas fa-user-friends" style="font-size: 24px;"></i>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-text">
+                <p class="card-label">Blocked Websites</p>
+                <p class="card-value">{{ blocked_websites_count }}</p>
+            </div>
+            <div class="icon-circle icon-red" aria-hidden="true">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon-svg" viewBox="0 0 24 24" stroke="currentColor">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                </svg>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-text">
+                <p class="card-label">Connected Devices</p>
+                <p class="card-value">{{ connected_devices_count }}</p>
+            </div>
+            <div class="icon-circle icon-green" aria-hidden="true">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon-svg" viewBox="0 0 24 24" stroke="currentColor">
+                    <rect x="3" y="7" width="18" height="10" rx="2" ry="2"></rect>
+                    <line x1="3" y1="7" x2="21" y2="7"></line>
+                    <line x1="7" y1="17" x2="7" y2="21"></line>
+                    <line x1="17" y1="17" x2="17" y2="21"></line>
+                </svg>
+            </div>
+        </div>
+        <a href="{{ url_for('admin_notification') }}" style="text-decoration: none;">
+          <div class="card">
+            <div class="card-text">
+              <p class="card-label">Active Alerts</p>
+              <p class="card-value">{{ active_alerts_count }}</p>  <!-- Display the active alerts count -->
+            </div>
+            <div class="icon-circle icon-yellow" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" class="icon-svg" viewBox="0 0 24 24" stroke="currentColor">
+                <path d="M10.29 3.86L1.82 18a1.5 1.5 0 001.29 2.25h16.78a1.5 1.5 0 001.29-2.25L13.71 3.86a1.5 1.5 0 00-2.42 0z"></path>
+                <line x1="12" y1="9" x2="12" y2="13"></line>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+              </svg>
+            </div>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <section>
+      <div class="recent-activity">
+        <h3>Recent Activity</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Action</th>
+              <th>Website</th>
+              <th>Time</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for log in recent_activity %}
+              <tr>
+                <td>{{ log.fullname }}</td>
+                <td>Visited</td>
+                <td>{{ log.website[:25] }}{% if log.website|length > 25 %}...{% endif %}</td>
+                <td class="time">{{ log.time }}</td>
+                <td>
+                  <span class="status-label {% if log.status == 'Blocked' %}status-blocked{% else %}status-safe{% endif %}">
+                    {{ log.status }}
+                  </span>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        <div class="view-all-container">
+          <a href="{{ url_for('admin_website_activity') }}" class="view-all-link" aria-label="View all activity">
+            <span>View All Activity</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- New cards below recent activity -->
+
+      <div class="below-activity-cards-container" aria-label="Additional features">
+        <a href="{{ url_for('admin_senior_users') }}" style="text-decoration: none;">
+          <div class="below-activity-card">
+            <div class="below-activity-icon-wrapper blue-bg" aria-hidden="true">
+              <i class="fas fa-user-friends"></i>
+            </div>
+            <div>
+              <h3>Manage Users</h3>
+              <p>Add, edit or remove senior users</p>
+            </div>
+          </div>
+        </a>
+        <a href="{{ url_for('admin_filtering_rules') }}" style="text-decoration: none;">
+          <div class="below-activity-card">
+            <div class="below-activity-icon-wrapper green-bg" aria-hidden="true">
+              <i class="fas fa-shield-alt"></i>
+            </div>
+            <div>
+              <h3>Filtering Rules</h3>
+              <p>Manage blocklist and whitelist</p>
+            </div>
+          </div>
+        </a>
+        <a href="{{ url_for('admin_report') }}" style="text-decoration: none;">
+          <div class="below-activity-card">
+            <div class="below-activity-icon-wrapper purple-bg" aria-hidden="true">
+              <i class="fas fa-globe"></i>
+            </div>
+            <div>
+              <h3>Generate Reports</h3>
+              <p>View usage and browsing history</p>
+            </div>
+          </div>
+        </a>
+      </div>
+    </section>
+
+       <div id="popup" class="popup">
+          <div class="popup-content">
+            <span class="close-popup" id="close-popup" aria-label="Close popup">
+              <i class="fas fa-times"></i> <!-- Close icon -->
+            </span>
+            <div class="popup-header">
+              <i class="fas fa-exclamation-triangle alert-icon"></i> <!-- Alert icon -->
+              <h3>Notification</h3>
+            </div>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                <ul class="flashes">
+                  {% for category, message in messages %}
+                    <li class="{{ category }}">{{ message }}</li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+            {% endwith %}
+          </div>
+        </div>
+
+
+
+
+
+  </main>
+</body>
+</html>
+
+
+
+
+
+<style>
+ .popup {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1000; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  background-color: rgba(0, 0, 0, 0.5); /* Black w/ opacity */
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
+}
+
+.popup-content {
+  background-color: #fff; /* White background */
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  position: relative; /* For positioning the close button */
+  max-width: 400px; /* Limit the width */
+  width: 90%; /* Responsive width */
+}
+
+.popup-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.alert-icon {
+  color: #f39c12; /* Alert icon color */
+  font-size: 24px; /* Size of the alert icon */
+  margin-right: 10px; /* Space between icon and text */
+}
+
+.close-popup {
+  position: absolute; /* Positioning the close button */
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+  color: #f44336; /* Close button color */
+  font-size: 20px; /* Size of the close icon */
+}
+
+.close-popup:hover {
+  color: #d32f2f; /* Darker red on hover */
+}
+
+
+</style>
+
+<script>
+ document.addEventListener("DOMContentLoaded", function() {
+  const popup = document.getElementById("popup");
+  const closeButton = document.getElementById("close-popup");
+
+  // Show the popup if there are messages
+  if (document.querySelector('.flashes')) {
+    popup.style.display = "flex"; // Show the popup
+  }
+
+  // Close the popup when the close button is clicked
+  closeButton.addEventListener("click", function() {
+    popup.style.display = "none"; // Hide the popup
+  });
+});
+
+</script>

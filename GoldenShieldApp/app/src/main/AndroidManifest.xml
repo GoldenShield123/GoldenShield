@@ -1,0 +1,24 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Required for network access -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:label="Golden Shield"
+        android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+
+        <!-- WebView Activity (no launcher) -->
+        <activity android:name=".WebViewActivity" />
+
+        <!-- Main Launcher Activity (requires exported=true) -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+    </application>
+</manifest>

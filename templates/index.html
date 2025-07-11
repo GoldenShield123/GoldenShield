@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Golden Shield</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='logo.png') }}">
+</head>
+<body>
+  <div class="container" role="main">
+    <div class="header">
+      <svg aria-hidden="true" viewBox="0 0 24 24">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+      </svg>
+      <h1>Golden Shield</h1>
+    </div>
+    <p class="description">
+      A Network-Based Rule Driven Website Filtering and Monitoring System for Senior Citizens
+    </p>
+    <button class="btn-senior" type="button" onclick="window.location.href='/login'">
+      <i class="fas fa-user" aria-hidden="true"></i>
+      <span>Senior Login</span>
+    </button>
+    <button class="btn-admin" type="button" onclick="window.location.href='/login'">
+      <i class="fas fa-user-friends" aria-hidden="true"></i>
+      <span>Admin Login</span>
+    </button>
+  </div>
+</body>
+</html>

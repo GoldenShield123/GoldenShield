@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Golden Shield Admin Filtering Rules</title>
+  <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='logo.png') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_filtering_rules.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet"/>
+</head>
+<body>
+  <aside>
+    <div class="sidebar-top">
+      <a href="#" class="logo-link" aria-label="Golden Shield logo">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill="white" stroke="#2563eb"></path>
+        </svg>
+        <span class="logo-text">Golden Shield</span>
+      </a>
+      <p class="dashboard-label">Admin Senior Users</p>
+      <nav class="sidebar-nav" aria-label="Main navigation">
+        <a href="{{ url_for('admin_dashboard') }}">
+          <i class="fas fa-th-large" aria-hidden="true"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="{{ url_for('admin_senior_users') }}" >
+          <i class="fas fa-user-friends" aria-hidden="true"></i>
+          <span>Senior Users</span>
+        </a>
+        <a href="{{ url_for('admin_website_activity') }}">
+          <i class="fas fa-globe" aria-hidden="true"></i>
+          <span>Website Activity</span>
+        </a>
+        <a href="{{ url_for('admin_filtering_rules') }}" class="active" aria-current="page">
+          <i class="fas fa-filter" aria-hidden="true"></i>
+          <span>Filtering Rules</span>
+        </a>
+        <a href="{{ url_for('admin_devices') }}">
+          <i class="fas fa-desktop" aria-hidden="true"></i>
+          <span>Devices</span>
+        </a>
+        <a href="{{ url_for('admin_notification') }}">
+          <i class="fas fa-bell" aria-hidden="true"></i>
+          <span>Notifications</span>
+        </a>
+        <a href="{{ url_for('admin_report') }}">
+          <i class="fas fa-file-alt" aria-hidden="true"></i>
+          <span>Reports</span>
+        </a>
+        <a href="{{ url_for('admin_setting') }}">
+          <i class="fas fa-cog" aria-hidden="true"></i>
+          <span>Settings</span>
+        </a>
+      </nav>
+    </div>
+    <div class="sidebar-bottom">
+      <a href="{{ url_for('logout') }}">
+        <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
+        <span>Logout</span>
+      </a>
+      <a href="#">
+        <i class="fas fa-user" aria-hidden="true"></i>
+        <span>Admin User</span>
+      </a>
+    </div>
+  </aside>
+
+  <main class="container">
+    <div class="header">
+      <h1>Filtering Management</h1>
+      <form>
+        <label for="search" class="sr-only">Search websites</label>
+        <input id="search" type="search" placeholder="Search websites..." class="search-input"/>
+      </form>
+    </div>
+
+    <div class="tabs" role="tablist" aria-label="Filter tabs">
+      <button id="blocklistBtn" class="tab active" role="tab" aria-selected="true" aria-controls="blocklistSection" tabindex="0">
+        <i class="fas fa-shield-alt"></i>
+        Blocklist
+      </button>
+      <button id="whitelistBtn" class="tab" role="tab" aria-selected="false" aria-controls="whitelistSection" tabindex="-1">
+        <i class="fas fa-shield-alt"></i>
+        Whitelist
+      </button>
+    </div>
+
+    <section id="blocklistSection" role="tabpanel" aria-labelledby="blocklistBtn">
+      <h2>
+        <i class="fas fa-exclamation-triangle" style="color:#DC2626;"></i>
+        Blocked Websites
+      </h2>
+
+      <form action="/add_blocked_site" method="POST">
+        <div class="form-group">
+          <label for="website-url">Website URL</label>
+          <input id="website-url" name="website_url" type="text" placeholder="example.com" required/>
+        </div>
+        <div class="form-group">
+          <label for="category">Category</label>
+          <input id="category" name="category" type="text" placeholder="Adult Content, Gambling, etc" required/>
+        </div>
+        <button type="submit" class="add-btn">
+          <i class="fas fa-plus"></i> Add to Blocklist
+        </button>
+      </form>
+
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Website URL</th>
+            <th scope="col">Category</th>
+            <th scope="col">Date Added</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for site in blocked_list %}
+          <tr>
+            <td>{{ site.website_url }}</td>
+            <td>{{ site.category }}</td>
+            <td>{{ site.date_added }}</td>
+            <td class="actions" aria-label="Delete {{ site.website_url }}" role="button" tabindex="0" onclick="deleteSite('{{ site.id }}')">
+              <i class="fas fa-trash-alt"></i>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+
+    <section id="whitelistSection" role="tabpanel" aria-labelledby="whitelistBtn" aria-label="Allowed Websites" style="display:none">
+      <h2>
+        <i class="fas fa-shield-alt" style="color:#22C55E;"></i>
+        Allowed Websites
+      </h2>
+
+      <form method="POST" action="/add_whitelist">
+        <div class="form-group">
+          <label for="whitelist-url">Website URL</label>
+          <input id="whitelist-url" name="website_url" type="text" placeholder="example.com" required />
+        </div>
+        <div class="form-group">
+          <label for="whitelist-category">Category</label>
+          <input id="whitelist-category" name="category" type="text" placeholder="Education, News, etc" required />
+        </div>
+        <button type="submit" class="add-btn">
+          <i class="fas fa-plus"></i> Add to Whitelist
+        </button>
+      </form>
+
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Website URL</th>
+            <th scope="col">Category</th>
+            <th scope="col">Date Added</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for site in whitelisted_list %}
+          <tr>
+            <td>{{ site.website_url }}</td>
+            <td>{{ site.category }}</td>
+            <td>{{ site.date_added }}</td>
+            <td class="actions" role="button" onclick="deleteWhitelistSite('{{ site.id }}')">
+              <i class="fas fa-trash-alt"></i>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+  </main>
+
+  <script>
+    const blocklistBtn = document.getElementById('blocklistBtn');
+    const whitelistBtn = document.getElementById('whitelistBtn');
+    const blocklistSection = document.getElementById('blocklistSection');
+    const whitelistSection = document.getElementById('whitelistSection');
+
+    function activateBlocklist() {
+      blocklistBtn.classList.add('active');
+      blocklistBtn.setAttribute('aria-selected', 'true');
+      blocklistBtn.setAttribute('tabindex', '0');
+      whitelistBtn.classList.remove('active');
+      whitelistBtn.setAttribute('aria-selected', 'false');
+      whitelistBtn.setAttribute('tabindex', '-1');
+      blocklistSection.style.display = 'block';
+      whitelistSection.style.display = 'none';
+    }
+
+    function activateWhitelist() {
+      whitelistBtn.classList.add('active');
+      whitelistBtn.setAttribute('aria-selected', 'true');
+      whitelistBtn.setAttribute('tabindex', '0');
+      blocklistBtn.classList.remove('active');
+      blocklistBtn.setAttribute('aria-selected', 'false');
+      blocklistBtn.setAttribute('tabindex', '-1');
+      whitelistSection.style.display = 'block';
+      blocklistSection.style.display = 'none';
+    }
+
+    blocklistBtn.addEventListener('click', activateBlocklist);
+    whitelistBtn.addEventListener('click', activateWhitelist);
+  </script>
+
+  <script>
+    function deleteSite(id) {
+      if (confirm('Are you sure you want to delete this blocked website?')) {
+        fetch(`/delete_blocked_site/${id}`, {
+          method: 'DELETE'
+        })
+        .then(res => {
+          if (res.ok) {
+            location.reload();
+          } else {
+            alert('Failed to delete.');
+          }
+        });
+      }
+    }
+
+    function deleteWhitelistSite(id) {
+      if (confirm('Are you sure you want to delete this whitelisted website?')) {
+        fetch(`/delete_whitelist/${id}`, { method: 'DELETE' })
+          .then(res => {
+            if (res.ok) location.reload();
+            else alert('Failed to delete whitelist entry.');
+          });
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="firebase_database_url" translatable="false">https://goldenshield-01-default-rtdb.asia-southeast1.firebasedatabase.app</string>
+    <string name="gcm_defaultSenderId" translatable="false">475759246719</string>
+    <string name="google_api_key" translatable="false">AIzaSyBXMD29eWiNcMxr2TW6_IGBDkhHO1J1a0E</string>
+    <string name="google_app_id" translatable="false">1:475759246719:android:525e97e8c357f97316ee4a</string>
+    <string name="google_crash_reporting_api_key" translatable="false">AIzaSyBXMD29eWiNcMxr2TW6_IGBDkhHO1J1a0E</string>
+    <string name="google_storage_bucket" translatable="false">goldenshield-01.firebasestorage.app</string>
+    <string name="project_id" translatable="false">goldenshield-01</string>
+</resources>

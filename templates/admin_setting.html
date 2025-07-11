@@ -1,0 +1,1096 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Golden Shield Admin Settings</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='logo.png') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_setting.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet"/>
+
+  <style>
+/* Modal styles */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1000; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0, 0, 0, 0.5); /* Black w/ opacity */
+}
+
+/* Modal Content */
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto; /* 15% from the top and centered */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; /* Could be more or less, depending on screen size */
+    max-width: 500px; /* Maximum width */
+    border-radius: 5px; /* Rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Shadow effect */
+}
+
+/* Input field styles */
+.modal-content input[type="password"] {
+    width: 100%; /* Full width */
+    padding: 10px; /* Padding inside the input */
+    margin: 10px 0; /* Margin for spacing */
+    border: 1px solid #ccc; /* Light gray border */
+    border-radius: 4px; /* Rounded corners */
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1); /* Inner shadow */
+}
+
+/* Button styles */
+.btn-save, .btn-cancel {
+    background-color: #4CAF50; /* Green background for save */
+    color: white; /* White text */
+    border: none; /* No border */
+    padding: 10px 15px; /* Padding for the button */
+    border-radius: 4px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+    margin-right: 10px; /* Space between buttons */
+    transition: background-color 0.3s; /* Smooth transition */
+}
+
+.btn-cancel {
+    background-color: #f44336; /* Red background for cancel */
+}
+
+.btn-save:hover {
+    background-color: #45a049; /* Darker green on hover */
+}
+
+.btn-cancel:hover {
+    background-color: #d32f2f; /* Darker red on hover */
+}
+
+
+/* Close button */
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+  </style>
+
+    <style>
+/* Alert container */
+.real-time-alerts-container {
+  position: relative;
+}
+
+/* Popup styles */
+#alert-popup {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 320px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  overflow: hidden;
+  transform: translateX(120%);
+  transition: transform 0.3s ease-out;
+}
+
+#alert-popup:not(.hidden) {
+  transform: translateX(0);
+}
+
+/* Header */
+.alert-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+}
+
+#alert-type {
+  font-weight: bold;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+/* Risk level colors */
+#alert-type.critical { background: #ffebee; color: #c62828; }
+#alert-type.high { background: #fff3e0; color: #e65100; }
+#alert-type.medium { background: #fff8e1; color: #f57f17; }
+#alert-type.low { background: #e8f5e9; color: #2e7d32; }
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #6c757d;
+  padding: 0;
+}
+
+/* Body */
+.alert-body {
+  padding: 15px;
+}
+
+.alert-body p {
+  margin: 8px 0;
+  color: #212529;
+}
+
+/* Toggle switch */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 24px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+  border-radius: 24px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+.hidden {
+  display: none;
+}
+
+        #realtime:checked ~ #alert-popup {
+  /* This ensures popup can still appear when checkbox is checked */
+}
+/* Visual indicator for persisted state */
+#realtime:checked + .slider {
+  box-shadow: 0 0 5px rgba(33, 150, 243, 0.5);
+}
+</style>
+
+<style>
+  /* Alert Popup Styles */
+  .alert-popup {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 300px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    overflow: hidden;
+    transform: translateY(-80px);
+    opacity: 0;
+    animation: slideIn 0.3s forwards;
+  }
+
+  @keyframes slideIn {
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  .alert-popup.hide {
+    animation: slideOut 0.3s forwards;
+  }
+
+  @keyframes slideOut {
+    to { transform: translateY(-80px); opacity: 0; }
+  }
+
+  .alert-header {
+    padding: 12px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+  }
+
+  .alert-type {
+    font-weight: bold;
+    text-transform: capitalize;
+  }
+
+  .alert-type.critical {
+    color: #dc3545;
+  }
+
+  .alert-type.high {
+    color: #fd7e14;
+  }
+
+  .alert-type.medium {
+    color: #ffc107;
+  }
+
+  .alert-type.low {
+    color: #28a745;
+  }
+
+  .close-btn {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: #6c757d;
+  }
+
+  .alert-body {
+    padding: 15px;
+  }
+
+  .alert-body p {
+    margin: 8px 0;
+    color: #495057;
+  }
+
+  /* Notifications List Styles */
+  #notifications-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .notification-item {
+    padding: 12px 15px;
+    border-bottom: 1px solid #e9ecef;
+    transition: background 0.2s;
+  }
+
+  .notification-item:hover {
+    background: #f8f9fa;
+  }
+
+  .notification-content p {
+    margin: 4px 0;
+  }
+
+  .notification-type {
+    font-weight: bold;
+    color: #343a40;
+  }
+
+  .notification-time {
+    color: #6c757d;
+    font-size: 14px;
+  }
+
+  .notification-website {
+    color: #495057;
+    font-size: 14px;
+  }
+</style>
+
+
+</head>
+<body>
+    <aside>
+        <div class="sidebar-top">
+          <a href="#" class="logo-link" aria-label="Golden Shield logo">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" >
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+            <span class="logo-text">Golden Shield</span>
+          </a>
+          <p class="dashboard-label">Admin Setting</p>
+          <nav class="sidebar-nav" aria-label="Main navigation">
+          <a href="{{ url_for('admin_dashboard') }}">
+            <i class="fas fa-th-large" aria-hidden="true"></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="{{ url_for('admin_senior_users') }}" >
+            <i class="fas fa-user-friends" aria-hidden="true"></i>
+            <span>Senior Users</span>
+          </a>
+          <a href="{{ url_for('admin_website_activity') }}">
+            <i class="fas fa-globe" aria-hidden="true"></i>
+            <span>Website Activity</span>
+          </a>
+          <a href="{{ url_for('admin_filtering_rules') }}">
+            <i class="fas fa-filter" aria-hidden="true"></i>
+            <span>Filtering Rules</span>
+          </a>
+          <a href="{{ url_for('admin_devices') }}">
+            <i class="fas fa-desktop" aria-hidden="true"></i>
+            <span>Devices</span>
+          </a>
+          <a href="{{ url_for('admin_notification') }}" >
+            <i class="fas fa-bell" aria-hidden="true"></i>
+            <span>Notifications</span>
+          </a>
+          <a href="{{ url_for('admin_report') }}">
+            <i class="fas fa-file-alt" aria-hidden="true"></i>
+            <span>Reports</span>
+          </a>
+          <a href="{{ url_for('admin_setting') }}" class="active" aria-current="page">
+            <i class="fas fa-cog" aria-hidden="true"></i>
+            <span>Settings</span>
+          </a>
+        </nav>
+        </div>
+        <div class="sidebar-bottom">
+          <a href="{{ url_for('logout') }}">
+            <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
+            <span>Logout</span>
+          </a>
+          <a href="#">
+            <i class="fas fa-user" aria-hidden="true"></i>
+            <span>Admin User</span>
+          </a>
+        </div>
+      </aside>
+
+
+  <div class="container">
+    <header style="display:flex; justify-content:space-between; align-items:center;">
+      <h1>Settings</h1>
+    </header>
+
+    <nav class="tabs" aria-label="Settings Tabs">
+      <button type="button" class="{% if active_tab == 'user-management' %}active{% endif %}" aria-current="page" data-tab="user-management">
+          <i class="fas fa-user-friends"></i>
+          User Management
+      </button>
+      <button type="button" class="{% if active_tab == 'filtering-preferences' %}active{% endif %}" data-tab="filtering-preferences">
+          <i class="fas fa-shield-alt"></i>
+          Filtering Preferences
+      </button>
+      <button type="button" class="{% if active_tab == 'notification-settings' %}active{% endif %}" data-tab="notification-settings">
+          <i class="fas fa-bell"></i>
+          Notification Settings
+      </button>
+      <button type="button" class="{% if active_tab == 'security-options' %}active{% endif %}" data-tab="security-options">
+          <i class="fas fa-lock"></i>
+          Security Options
+      </button>
+      <button type="button" class="{% if active_tab == 'backup-data' %}active{% endif %}" data-tab="backup-data">
+          <i class="fas fa-database"></i>
+          Backup &amp; Data
+      </button>
+    </nav>
+
+
+    <section class="user-management" aria-label="User Management Section">
+      <h2>User Management</h2>
+      <p class="description">Add Guardian or Admin</p>
+
+      <form class="add-user" action="/add_user" method="post" novalidate>
+        <div>
+            <label for="email">Email Address</label>
+            <input id="email" name="email" type="email" placeholder="email@example.com" autocomplete="email" required/>
+        </div>
+        <div>
+            <label for="role">Role</label>
+            <select id="role" name="role" autocomplete="off" required>
+                <option value="Guardian">Guardian</option>
+                <option value="Admin">Admin</option>
+            </select>
+        </div>
+        <button type="submit">Add User</button>
+    </form>
+
+
+      <h3 class="current-users-title">Current Guardians &amp; Admins</h3>
+
+        <ul class="current-users">
+            {% for user in current_users %}
+            <li>
+                <div class="info">
+                    <p class="email" title="{{ user.email }}">{{ user.email }}</p>
+                    <p class="role">{{ user.role }}</p>
+                </div>
+                <div class="actions">
+                    <button type="button" class="edit-btn" onclick="openEditModal('{{ user.email }}')">Edit</button>
+                    {% if user.role != 'admin' %}
+                    <button type="button" class="delete-btn btn-delete" aria-label="Delete {{ user.email }}" onclick="deleteUser ('{{ user.email }}')">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                    {% endif %}
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+
+        <!-- Edit User Modal -->
+          <div id="editUser Modal" class="modal" style="display:none;">
+              <div class="modal-content">
+                  <span class="close" onclick="closeEditModal()">&times;</span>
+                  <h2>Edit User Password</h2>
+                  <form id="editUser Form" method="post" action="/update_password">
+                      <input type="hidden" id="editUser Email" name="email" />
+                      <div>
+                          <label for="newPassword">New Password</label>
+                          <input type="password" id="newPassword" name="new_password" required />
+                      </div>
+                      <button type="submit" class="btn-save">Save</button>
+                      <button type="button" onclick="closeEditModal()" class="btn-cancel">Cancel</button>
+                  </form>
+              </div>
+          </div>
+
+
+
+    </section>
+
+    <section class="filtering-preferences hidden" role="region" aria-label="Filtering Preferences">
+    <h2>Filtering Preferences</h2>
+    <h3>Default Settings for New Users</h3>
+
+    <label for="filter-level" class="filter-label">Default Filter Level</label>
+    <select id="filter-level" name="filter-level" aria-describedby="filter-level-desc">
+        <option>Safe (Standard Protection)</option>
+    </select>
+
+    <hr />
+
+    <h3>Content Categories</h3>
+
+    <div class="content-categories">
+<!--        <div class="category-item">-->
+<!--            <div class="category-text">-->
+<!--                <p class="category-title">Block Social Media</p>-->
+<!--                <p class="category-desc">Restrict access to social media platforms</p>-->
+<!--            </div>-->
+<!--            <label class="switch" for="toggle-social">-->
+<!--                <input type="checkbox" id="toggle-social" />-->
+<!--                <span class="slider"></span>-->
+<!--            </label>-->
+<!--        </div>-->
+
+        <div class="category-item">
+            <div class="category-text">
+                <p class="category-title">Block Gambling</p>
+                <p class="category-desc">Restrict access to gambling websites</p>
+            </div>
+            <label class="switch" for="toggle-gambling">
+                <input type="checkbox" id="toggle-gambling" onchange="updateBlockingPreferences()" />
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <div class="category-item">
+            <div class="category-text">
+                <p class="category-title">Block Adult Content</p>
+                <p class="category-desc">Restrict access to adult content</p>
+            </div>
+            <label class="switch" for="toggle-adult">
+                <input type="checkbox" id="toggle-adult" onchange="updateBlockingPreferences()" />
+                <span class="slider"></span>
+            </label>
+        </div>
+    </div>
+</section>
+
+<script>
+    // Fetch filtering preferences from Firebase when the page loads
+    document.addEventListener('DOMContentLoaded', function() {
+    fetch('/get_filtering_preferences')
+        .then(response => response.json())
+        .then(data => {
+            if (data) {
+                document.getElementById('toggle-gambling').checked = data.block_gambling;
+                document.getElementById('toggle-adult').checked = data.block_adult;
+            }
+        })
+        .catch(error => console.error('Error fetching filtering preferences:', error));
+});
+
+
+    function updateBlockingPreferences() {
+        const gamblingChecked = document.getElementById('toggle-gambling').checked;
+        const adultChecked = document.getElementById('toggle-adult').checked;
+
+        fetch('/update_filtering_preferences', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                block_gambling: gamblingChecked,
+                block_adult: adultChecked
+            })
+        })
+        .then(response => {
+            if (response.ok) {
+                alert("Filtering preferences updated successfully.");
+            } else {
+                alert("Failed to update filtering preferences.");
+            }
+        });
+    }
+</script>
+
+
+
+
+
+    <main class="notification-settings hidden" aria-label="Notification Settings">
+      <h2>Notification Settings</h2>
+      <p class="subtitle">Alert Preferences</p>
+
+      <section>
+          <div class="real-time-alerts-container">
+        <div class="alert-item">
+            <div class="alert-text">
+              <strong>Real-time Alerts</strong>
+              <span>Receive immediate popup notifications</span>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="realtime" />
+              <span class="slider"></span>
+            </label>
+          </div>
+
+        <div class="alert-item">
+          <div class="alert-text">
+            <strong>Email Notifications</strong>
+            <span>Receive notifications via email</span>
+          </div>
+          <label class="switch" for="emailnotif">
+            <input type="checkbox" id="emailnotif" />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+
+  <div id="alert-popup" class="hidden">
+    <div class="alert-header">
+      <span id="alert-type" class="critical">Alert Type</span>
+      <button id="close-alert" class="close-btn">&times;</button>
+    </div>
+    <div class="alert-body">
+      <p><strong>Date:</strong> <span id="alert-date"></span></p>
+      <p><strong>Time:</strong> <span id="alert-time"></span></p>
+      <p><strong>Website:</strong> <span id="alert-website"></span></p>
+    </div>
+  </div>
+</div>
+
+<!--        <div class="alert-item">-->
+<!--          <div class="alert-text">-->
+<!--            <strong>SMS Notifications</strong>-->
+<!--            <span>Receive notifications via text message</span>-->
+<!--          </div>-->
+<!--          <label class="switch" for="smsnotif">-->
+<!--            <input type="checkbox" id="smsnotif" />-->
+<!--            <span class="slider"></span>-->
+<!--          </label>-->
+<!--        </div>-->
+      </section>
+
+      <hr />
+
+      <section>
+        <h3>Notification Channels</h3>
+        <div style="margin-bottom: 16px;">
+          <label for="preferred-channel">Preferred Channel</label>
+          <select id="preferred-channel" name="preferred-channel" aria-label="Preferred Channel">
+            <option>Email</option>
+          </select>
+        </div>
+        <div>
+          <label for="notification-email">Notification Email</label>
+          <input type="email" id="notification-email" name="notification-email" placeholder="email@example.com" aria-label="Notification Email" />
+        </div>
+      </section>
+    </main>
+
+      <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const realtimeCheckbox = document.getElementById('realtime');
+            const emailCheckbox = document.getElementById('emailnotif');
+
+            realtimeCheckbox.addEventListener('change', function() {
+                if (this.checked) {
+                    // Code to enable real-time alerts
+                    console.log("Real-time alerts enabled");
+                    // You can add your real-time alert logic here
+                } else {
+                    // Code to disable real-time alerts
+                    console.log("Real-time alerts disabled");
+                }
+            });
+
+            emailCheckbox.addEventListener('change', function() {
+                if (this.checked) {
+                    // Code to enable email notifications
+                    console.log("Email notifications enabled");
+                    // You can add your email notification logic here
+                } else {
+                    // Code to disable email notifications
+                    console.log("Email notifications disabled");
+                }
+            });
+        });
+      </script>
+
+    <main class="security-options hidden" aria-label="Security Options">
+      <section>
+        <h2>Security Options</h2>
+        <h3>Account Security</h3>
+
+        <form class="flex-row" onsubmit="event.preventDefault()">
+          <label for="admin-password" class="sr-only">Change Admin Password</label>
+          <div style="flex-grow:1; width: 100%;">
+            <label for="admin-password">Change Admin Password</label>
+            <input
+              id="admin-password"
+              type="password"
+              placeholder="New password"
+              autocomplete="new-password"
+            />
+          </div>
+          <button type="submit" class="update">Update</button>
+        </form>
+
+        <div class="toggle-wrapper">
+          <div class="toggle-text">
+            <p>Enable Two-Factor Authentication (2FA)</p>
+            <p>Add an extra layer of security to your account</p>
+          </div>
+          <label class="switch" for="toggle-2fa">
+            <input type="checkbox" id="toggle-2fa" />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <hr />
+      </section>
+
+      <section>
+        <h3>Session Settings</h3>
+
+        <form class="flex-row" onsubmit="event.preventDefault()">
+          <div style="flex-grow:1; width: 100%;">
+            <label for="session-timeout">Session Timeout (minutes)</label>
+            <input id="session-timeout" type="number" value="30" min="1" />
+          </div>
+          <button type="submit" class="apply">Apply</button>
+        </form>
+
+        <p class="text-muted">Automatically log out after period of inactivity</p>
+
+        <button type="button" class="force-logout">
+          <i class="fas fa-sync-alt" aria-hidden="true"></i>
+          Force Logout All Sessions
+        </button>
+      </section>
+    </main>
+
+    <main class="backup-data hidden" aria-label="Backup and Data Settings">
+      <header>
+        <h2>Backup &amp; Data</h2>
+        <p class="subtitle">Backup Settings</p>
+      </header>
+
+      <section aria-labelledby="automatic-backups-label" style="margin-bottom: 24px;">
+        <div class="automatic-backups-container">
+          <label id="automatic-backups-label" class="section-label" for="toggle">Automatic Backups</label>
+          <label class="toggle">
+            <input type="checkbox" id="toggle" aria-checked="false" role="switch" />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <p class="section-desc" style="margin-top: 8px;">Regularly backup activity logs and settings</p>
+      </section>
+
+      <section aria-labelledby="backup-frequency-label" style="margin-bottom: 24px;">
+        <label id="backup-frequency-label" class="section-label" for="backup-frequency">Backup Frequency</label>
+        <select id="backup-frequency" name="backup-frequency" aria-describedby="backup-frequency-desc" aria-label="Backup Frequency">
+          <option>Weekly</option>
+        </select>
+      </section>
+
+      <section style="margin-bottom: 24px;">
+        <button type="button" class="btn btn-blue" aria-label="Backup Now">
+          <i class="fas fa-download icon" aria-hidden="true"></i> Backup Now
+        </button>
+        <button type="button" class="btn btn-outline" aria-label="Restore Backup" style="margin-left: 8px;">
+          <i class="fas fa-upload icon" aria-hidden="true"></i> Restore Backup
+        </button>
+      </section>
+
+      <hr />
+
+      <section aria-labelledby="data-retention-label" style="margin-top: 24px; margin-bottom: 24px;">
+        <p id="data-retention-label" class="section-label" style="font-size: 14px; margin-bottom: 8px;">Data Retention</p>
+        <label for="keep-data" class="section-label" style="font-size: 10px; margin-bottom: 4px;">Keep Data For (days)</label>
+        <div class="data-retention-row">
+          <input type="text" id="keep-data" name="keep-data" value="90" aria-describedby="data-retention-desc" aria-label="Keep Data For (days)" />
+          <button type="button" class="btn btn-outline" aria-label="Apply data retention days">Apply</button>
+        </div>
+        <p id="data-retention-desc" class="section-desc" style="margin-top: 4px;">Automatically delete data older than the specified period</p>
+        <button type="button" class="btn btn-red" style="margin-top: 12px;" aria-label="Clear All Data">
+          <i class="fas fa-trash-alt icon" aria-hidden="true"></i> Clear All Data
+        </button>
+      </section>
+
+      <hr />
+
+      <section aria-labelledby="system-info-label" class="system-info">
+        <p id="system-info-label" class="title">System Information</p>
+        <div class="info-grid">
+          <div class="info-box">
+            <p class="info-label">Version</p>
+            <p class="info-value">Golden Shield v1.2.3</p>
+          </div>
+          <div class="info-box">
+            <p class="info-label">Router Integration</p>
+            <p class="info-value green">Connected</p>
+          </div>
+          <div class="info-box">
+            <p class="info-label">Last Update</p>
+            <p class="info-value">April 15, 2023</p>
+          </div>
+          <div class="info-box">
+            <p class="info-label">Last Check-in</p>
+            <p class="info-value">Today, 10:30 AM</p>
+          </div>
+        </div>
+        <button type="button" class="btn-check-updates" aria-label="Check for Updates">
+          <i class="far fa-clock icon" aria-hidden="true"></i> Check for Updates
+        </button>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const tabs = document.querySelectorAll('nav.tabs button[data-tab]');
+    const userManagementSection = document.querySelector('section.user-management');
+    const filteringSection = document.querySelector('section.filtering-preferences');
+    const notificationSection = document.querySelector('main.notification-settings');
+    const securitySection = document.querySelector('main.security-options');
+    const backupSection = document.querySelector('main.backup-data');
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        // Remove active class from all tabs
+        tabs.forEach(t => t.classList.remove('active'));
+        // Add active class to clicked tab
+        tab.classList.add('active');
+
+        // Hide all sections initially
+        userManagementSection.classList.add('hidden');
+        filteringSection.classList.add('hidden');
+        notificationSection.classList.add('hidden');
+        securitySection.classList.add('hidden');
+        backupSection.classList.add('hidden');
+
+        // Show selected section
+        const selected = tab.getAttribute('data-tab');
+        if (selected === 'user-management') {
+          userManagementSection.classList.remove('hidden');
+        } else if (selected === 'filtering-preferences') {
+          filteringSection.classList.remove('hidden');
+        } else if (selected === 'notification-settings') {
+          notificationSection.classList.remove('hidden');
+        } else if (selected === 'security-options') {
+          securitySection.classList.remove('hidden');
+        } else if (selected === 'backup-data') {
+          backupSection.classList.remove('hidden');
+        }
+      });
+    });
+  </script>
+
+
+
+<script>
+function deleteUser (email) {
+    if (confirm("Are you sure you want to delete this user?")) {
+        fetch(`/delete_user/${email}`, {
+            method: 'DELETE'
+        })
+        .then(response => {
+            if (response.ok) {
+                location.reload(); // Reload the page to see the changes
+            } else {
+                alert("Failed to delete user.");
+            }
+        });
+    }
+}
+</script>
+
+<script>
+function openEditModal(email) {
+    document.getElementById('editUser Email').value = email; // Set the email in the hidden input
+    document.getElementById('editUser Modal').style.display = 'block'; // Show the modal
+}
+
+function closeEditModal() {
+    document.getElementById('editUser Modal').style.display = 'none'; // Hide the modal
+}
+</script>
+
+
+<script>
+function updateBlockingPreferences() {
+    const gamblingChecked = document.getElementById('toggle-gambling').checked;
+    const adultChecked = document.getElementById('toggle-adult').checked;
+
+    fetch('/update_filtering_preferences', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            block_gambling: gamblingChecked,
+            block_adult: adultChecked
+        })
+    })
+    .then(response => {
+        if (response.ok) {
+            alert("Filtering preferences updated successfully.");
+        } else {
+            alert("Failed to update filtering preferences.");
+        }
+    });
+}
+</script>
+
+
+<script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
+
+<script>
+  // Initialize Firebase
+  const firebaseConfig = {
+    apiKey: "AIzaSyD00O5_-2rTvf0Scx-oOrqB7glOwSomKBU",
+      authDomain: "goldenshield-01.firebaseapp.com",
+      databaseURL: "https://goldenshield-01-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "goldenshield-01",
+      storageBucket: "goldenshield-01.firebasestorage.app",
+      messagingSenderId: "475759246719",
+      appId: "1:475759246719:web:544ae71ee593a02316ee4a",
+      measurementId: "G-Z1S2GFHDCC"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const database = firebase.database();
+
+  // Listen for new notifications
+  function setupRealtimeAlerts() {
+    const alertsRef = database.ref('notification_alerts');
+
+    alertsRef.orderByChild('timestamp').limitToLast(1).on('child_added', (snapshot) => {
+      const alert = snapshot.val();
+
+      if (document.getElementById('realtime').checked) {
+        showAlertPopup(alert);
+      }
+
+      // Also update the notifications list
+      addNotificationToList(alert);
+    });
+  }
+
+  // Show popup alert
+  function showAlertPopup(alert) {
+    const popup = document.createElement('div');
+    popup.className = 'alert-popup';
+    popup.innerHTML = `
+      <div class="alert-header">
+        <span class="alert-type ${alert.type_risk.toLowerCase()}">${alert.type} (${alert.type_risk})</span>
+        <button class="close-btn">&times;</button>
+      </div>
+      <div class="alert-body">
+        <p><strong>Date:</strong> ${alert.date}</p>
+        <p><strong>Time:</strong> ${alert.time}</p>
+        <p><strong>Website:</strong> ${alert.website}</p>
+      </div>
+    `;
+
+    document.body.appendChild(popup);
+
+    // Auto dismiss after 10 seconds
+    setTimeout(() => {
+      popup.classList.add('hide');
+      setTimeout(() => popup.remove(), 500);
+    }, 10000);
+
+    // Manual dismiss
+    popup.querySelector('.close-btn').addEventListener('click', () => {
+      popup.classList.add('hide');
+      setTimeout(() => popup.remove(), 500);
+    });
+  }
+
+  // Add notification to list view
+  function addNotificationToList(alert) {
+    const list = document.getElementById('notifications-list');
+    const notification = document.createElement('li');
+
+    notification.className = `notification-item ${alert.type_risk.toLowerCase()}`;
+    notification.innerHTML = `
+      <div class="notification-content">
+        <p class="notification-type">${alert.type} (${alert.type_risk})</p>
+        <p class="notification-time">${alert.date} at ${alert.time}</p>
+        <p class="notification-website">Website: ${alert.website}</p>
+      </div>
+    `;
+
+    list.insertBefore(notification, list.firstChild);
+  }
+
+  // Initialize when page loads
+  document.addEventListener('DOMContentLoaded', () => {
+    setupRealtimeAlerts();
+
+    // Toggle real-time alerts
+    document.getElementById('realtime').addEventListener('change', function() {
+      localStorage.setItem('realtime-alerts', this.checked);
+    });
+  });
+</script>
+
+
+<script>
+// Initialize Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyD00O5_-2rTvf0Scx-oOrqB7glOwSomKBU",
+      authDomain: "goldenshield-01.firebaseapp.com",
+      databaseURL: "https://goldenshield-01-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "goldenshield-01",
+      storageBucket: "goldenshield-01.firebasestorage.app",
+      messagingSenderId: "475759246719",
+      appId: "1:475759246719:web:544ae71ee593a02316ee4a",
+      measurementId: "G-Z1S2GFHDCC"
+};
+
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
+
+// Persistent state management
+const ALERT_STORAGE_KEY = 'realtimeAlertsState';
+const SHOWN_ALERTS_KEY = 'shownAlerts';
+
+// Initialize state from localStorage
+let shownAlerts = new Set(JSON.parse(localStorage.getItem(SHOWN_ALERTS_KEY) || '[]'));
+
+// Save state to localStorage
+function saveState() {
+  localStorage.setItem(SHOWN_ALERTS_KEY, JSON.stringify([...shownAlerts]));
+}
+
+function showAlertOnce(alert, alertId) {
+  const isEnabled = document.getElementById('realtime').checked;
+
+  if (shownAlerts.has(alertId) || !isEnabled) {
+    return;
+  }
+
+  shownAlerts.add(alertId);
+  saveState();
+
+  // Update and show popup
+  updatePopupContent(alert);
+  showPopup();
+}
+
+function updatePopupContent(alert) {
+  const typeElement = document.getElementById('alert-type');
+  typeElement.textContent = `${alert.type} (${alert.type_risk})`;
+  typeElement.className = alert.type_risk.toLowerCase();
+  document.getElementById('alert-date').textContent = alert.date;
+  document.getElementById('alert-time').textContent = alert.time;
+  document.getElementById('alert-website').textContent = alert.website || 'N/A';
+}
+
+function showPopup() {
+  const popup = document.getElementById('alert-popup');
+  popup.classList.remove('hidden');
+
+  // Auto-hide after 8 seconds (unless manually closed)
+  setTimeout(() => {
+    if (!popup.classList.contains('hidden')) {
+      popup.classList.add('hidden');
+    }
+  }, 8000);
+}
+
+// Set up Firebase listener
+function setupAlertsListener() {
+  const alertsRef = database.ref('notification_alerts');
+
+  alertsRef.orderByChild('timestamp').on('child_added', (snapshot) => {
+    const alert = snapshot.val();
+    showAlertOnce(alert, snapshot.key);
+  });
+}
+
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', () => {
+  // Restore checkbox state
+  const realtimeCheckbox = document.getElementById('realtime');
+  realtimeCheckbox.checked = localStorage.getItem(ALERT_STORAGE_KEY) === 'true';
+
+  // Set up event listeners
+  realtimeCheckbox.addEventListener('change', (e) => {
+    localStorage.setItem(ALERT_STORAGE_KEY, e.target.checked);
+  });
+
+  document.getElementById('close-alert').addEventListener('click', () => {
+    document.getElementById('alert-popup').classList.add('hidden');
+  });
+
+  // Start listening for alerts
+  setupAlertsListener();
+
+  // Clear old alerts from storage periodically (keep last 100)
+  window.setInterval(() => {
+    if (shownAlerts.size > 100) {
+      const array = [...shownAlerts];
+      shownAlerts = new Set(array.slice(array.length - 100));
+      saveState();
+    }
+  }, 60000); // Run every minute
+});
+</script>
+
+
+</body>
+</html>

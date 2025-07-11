@@ -1,0 +1,14 @@
+[
+    {
+        "merged": "com.company.goldenshield.app-debug-35:/layout_activity_main.xml.flat",
+        "source": "com.company.goldenshield.app-main-37:/layout/activity_main.xml"
+    },
+    {
+        "merged": "com.company.goldenshield.app-debug-35:/layout_activity_webview.xml.flat",
+        "source": "com.company.goldenshield.app-main-37:/layout/activity_webview.xml"
+    },
+    {
+        "merged": "com.company.goldenshield.app-debug-35:/drawable_logo.png.flat",
+        "source": "com.company.goldenshield.app-main-37:/drawable/logo.png"
+    }
+]

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App Name -->
+    <string name="app_name">Golden Shield</string>
+
+    <!-- Buttons -->
+    <string name="refresh_button">Refresh Block List</string>
+    <string name="browser_button">Open Safe Browser</string>
+
+    <!-- Toast Messages -->
+    <string name="toast_refresh_success">Block list refreshed successfully!</string>
+    <string name="toast_refresh_fail">Failed to refresh block list.</string>
+    <string name="toast_history_fail">Failed to load browsing history.</string>
+
+    <!-- Labels -->
+    <string name="browsing_history_label">Browsing History</string>
+</resources>
